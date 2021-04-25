@@ -36,16 +36,40 @@
       </ion-header> -->
       <ion-list>
         <ion-item-group v-bind:key="month.name" v-for="month in loadMonths()">
-          <ion-item-divider color="light" sticky
+          <ion-item-divider color="primary" sticky
             >{{ month.name }} {{ month.year }}</ion-item-divider
           >
           <ion-item v-for="day in month.days" v-bind:key="day.date">
-            <ion-label color="medium">
-              <div>{{ day.weekday }}.</div>
-              <div class="bigger">
-                {{ day.date }}
-              </div>
-            </ion-label>
+            <ion-grid>
+              <ion-row>
+                <ion-col size="4">
+                  <ion-label :color="switchLabelColor(day)">
+                    <div>{{ day.weekday }}.</div>
+                    <div class="bigger">
+                      {{ day.date }}
+                    </div>
+                  </ion-label>
+                </ion-col>
+
+                <ion-col size="4" v-if="day.hasEntry && day.entry">
+                  <ion-text v-if="isWork(day.entry.type)">
+                    {{ formatTime(day.entry.start) }} -
+                    {{ formatTime(day.entry.end) }}
+                  </ion-text>
+                </ion-col>
+
+                <ion-col
+                  size="4"
+                  class="ion-text-end"
+                  v-if="day.hasEntry && day.entry"
+                >
+                  {{ formatWorkTime(day.entry.worktime) }}<br />
+                  <ion-text :color="switchOvertimeColor(day.entry.overtime)">{{
+                    day.entry.overtime
+                  }}</ion-text>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
           </ion-item>
         </ion-item-group>
       </ion-list>
@@ -66,9 +90,11 @@ import {
   IonContent,
   IonList,
   IonItem,
+  IonLabel,
+  IonItemGroup,
+  IonItemDivider,
+  IonText,
 } from "@ionic/vue";
-
-import * as moment from 'moment';
 
 function daysInMonth(month: number, year: number): number {
   return new Date(year, month, 0).getDate();
@@ -84,10 +110,12 @@ interface Day {
   weekday: string;
   date: string;
   hasEntry: boolean;
+  entry?: Entry;
 }
 
 interface Entry {
-  overtime: moment.Duration;
+  overtime: string;
+  worktime?: string;
   start: Date;
   end: Date;
   fullDay: boolean;
@@ -95,7 +123,22 @@ interface Entry {
 }
 
 enum EntryType {
-  OVERTIME, WORK, VACATION
+  OVERTIME,
+  WORK,
+  VACATION,
+  ILL,
+}
+
+function isDateEqualsTimeIgnoring(firstDate: Date, secondDate: Date): boolean {
+  const dateEqualsOptions: Intl.DateTimeFormatOptions = {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  };
+  return (
+    firstDate.toLocaleDateString(navigator.language, dateEqualsOptions) ===
+    secondDate.toLocaleDateString(navigator.language, dateEqualsOptions)
+  );
 }
 
 export default {
@@ -112,6 +155,10 @@ export default {
     IonContent,
     IonList,
     IonItem,
+    IonLabel,
+    IonItemGroup,
+    IonItemDivider,
+    IonText,
   },
   data() {
     return {
@@ -120,16 +167,79 @@ export default {
   },
   methods: {
     calcOvertime() {
-      return 0;
+      return 40;
     },
     calcToday() {
-      return 0;
+      return 7;
+    },
+    switchLabelColor(day: Day) {
+      return day.hasEntry && day.entry
+        ? day.entry.type === EntryType.OVERTIME
+          ? "warning"
+          : day.entry.type === EntryType.VACATION
+          ? "secondary"
+          : day.entry.type === EntryType.ILL
+          ? "tertiary"
+          : "primary"
+        : "medium";
+    },
+    switchOvertimeColor(overtime: string) {
+      return overtime.startsWith("-") ? "danger" : "success";
+    },
+    formatTime(date: Date) {
+      return date.toLocaleTimeString(navigator.language, {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    },
+    formatWorkTime(worktime: string) {
+      if (worktime) {
+        return worktime;
+      }
+      return "0:00";
+    },
+    isWork(entryType: EntryType) {
+      return entryType === EntryType.WORK;
     },
     loadMonths(): Month[] {
       const months: Month[] = [];
       const mockDataEntries: Entry[] = [
         {
-          overtime: moment.Duration()
+          overtime: "1:45",
+          start: new Date(2021, 3, 23, 7, 45),
+          end: new Date(2021, 3, 23, 18),
+          worktime: "9:45",
+          fullDay: false,
+          type: EntryType.WORK,
+        },
+        {
+          overtime: "1:30",
+          start: new Date(2021, 3, 22, 6),
+          end: new Date(2021, 3, 22, 16),
+          worktime: "9:30",
+          fullDay: false,
+          type: EntryType.WORK,
+        },
+        {
+          overtime: "-8:00",
+          start: new Date(2021, 3, 9, 0),
+          end: new Date(2021, 3, 9, 24),
+          fullDay: true,
+          type: EntryType.OVERTIME,
+        },
+        {
+          overtime: "0:00",
+          start: new Date(2021, 2, 26, 0),
+          end: new Date(2021, 2, 26, 24),
+          fullDay: true,
+          type: EntryType.ILL,
+        },
+        {
+          overtime: "0:00",
+          start: new Date(2021, 2, 14, 0),
+          end: new Date(2021, 2, 14, 24),
+          fullDay: true,
+          type: EntryType.VACATION,
         },
       ];
 
@@ -150,7 +260,13 @@ export default {
           year: baseDate.getFullYear(),
           days: [],
         };
-        for (let day = 1; day < daysInMonth(month, year); day++) {
+
+        const latestDay =
+          year === new Date().getFullYear() && month === new Date().getMonth()
+            ? new Date().getDate()
+            : daysInMonth(month, year) - 1;
+
+        for (let day = latestDay; day > 0; day--) {
           const date = new Date(year, month, day);
           const onlyWeekDayOptions: Intl.DateTimeFormatOptions = {
             weekday: "short",
@@ -163,6 +279,12 @@ export default {
               onlyWeekDayOptions
             ),
             date: date.toLocaleDateString(navigator.language, onlyDayOptions),
+            hasEntry: mockDataEntries.some((entry) =>
+              isDateEqualsTimeIgnoring(entry.start, date)
+            ),
+            entry: mockDataEntries.find((entry) =>
+              isDateEqualsTimeIgnoring(entry.start, date)
+            ),
           };
 
           currentMonth.days.push(newDay);
