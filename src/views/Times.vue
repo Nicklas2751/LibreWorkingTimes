@@ -95,38 +95,10 @@ import {
   IonItemDivider,
   IonText,
 } from "@ionic/vue";
+import { Month, Day, Entry, EntryType } from "../types";
 
 function daysInMonth(month: number, year: number): number {
   return new Date(year, month, 0).getDate();
-}
-
-interface Month {
-  name: string;
-  year: number;
-  days: Day[];
-}
-
-interface Day {
-  weekday: string;
-  date: string;
-  hasEntry: boolean;
-  entry?: Entry;
-}
-
-interface Entry {
-  overtime: string;
-  worktime?: string;
-  start: Date;
-  end: Date;
-  fullDay: boolean;
-  type: EntryType;
-}
-
-enum EntryType {
-  OVERTIME,
-  WORK,
-  VACATION,
-  ILL,
 }
 
 function isDateEqualsTimeIgnoring(firstDate: Date, secondDate: Date): boolean {
