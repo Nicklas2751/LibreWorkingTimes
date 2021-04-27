@@ -12,10 +12,11 @@ export interface Day {
 }
 
 export interface Entry {
-    overtime: string;
-    worktime?: string;
+    overtime?: Duration;
+    worktime?: Duration;
+    pausetime?: Duration;
     start: Date;
-    end: Date;
+    end?: Date;
     fullDay: boolean;
     type: EntryType;
 }
@@ -25,4 +26,19 @@ export enum EntryType {
     WORK,
     VACATION,
     ILL,
+}
+
+export class Duration {
+    hours: number;
+    minutes: number;
+
+    constructor(hours: number, minutes: number) {
+        this.hours = hours;
+        this.minutes = minutes;
+    }
+
+    public toString(): string {
+        return this.hours + ":" + ((this.minutes < 10) ? "0" : "") + this.minutes;
+    }
+
 }

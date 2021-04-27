@@ -10,8 +10,15 @@
             <ion-col class="ion-align-self-center" size="6">
               <span class="bold">Überstunden:</span> {{ calcOvertime() }}
             </ion-col>
-            <ion-col class="ion-align-self-center" size="6">
-              <span class="bold">Heute:</span> {{ calcToday() }}
+            <ion-col class="ion-align-self-center" size="3">
+              <span class="bold">Heute:</span>
+            </ion-col>
+            <ion-col class="ion-align-self-center" size="3">
+              {{ formatWorkTime(getCurrentOrTodayEntry().worktime) }}<br />
+              <ion-text
+                :color="switchOvertimeColor(getCurrentOrTodayEntry().overtime)"
+                >{{ getCurrentOrTodayEntry().overtime.toString() }}</ion-text
+              >
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -65,7 +72,7 @@
                 >
                   {{ formatWorkTime(day.entry.worktime) }}<br />
                   <ion-text :color="switchOvertimeColor(day.entry.overtime)">{{
-                    day.entry.overtime
+                    day.entry.overtime.toString()
                   }}</ion-text>
                 </ion-col>
               </ion-row>
@@ -95,7 +102,8 @@ import {
   IonItemDivider,
   IonText,
 } from "@ionic/vue";
-import { Month, Day, Entry, EntryType } from "../types";
+import { Month, Day, Entry, EntryType, Duration } from "../types";
+import TimeService from "@/servies/times.service";
 
 function daysInMonth(month: number, year: number): number {
   return new Date(year, month, 0).getDate();
@@ -110,6 +118,62 @@ function isDateEqualsTimeIgnoring(firstDate: Date, secondDate: Date): boolean {
   return (
     firstDate.toLocaleDateString(navigator.language, dateEqualsOptions) ===
     secondDate.toLocaleDateString(navigator.language, dateEqualsOptions)
+  );
+}
+
+function setupMockData() {
+  const mockDataEntries: Entry[] = [
+    {
+      start: new Date(),
+      end: new Date(2021, 3, 27, 4,0),
+      fullDay: false,
+      type: EntryType.WORK,
+    },
+    {
+      start: new Date(2021,3,26, 19,0),
+      end: new Date(2021, 3, 26, 20,0),
+      fullDay: false,
+      type: EntryType.WORK,
+    },
+    {
+      start: new Date(2021, 3, 23, 7, 45),
+      end: new Date(2021, 3, 23, 18),
+      fullDay: false,
+      type: EntryType.WORK,
+    },
+    {
+      start: new Date(2021, 3, 22, 6),
+      end: new Date(2021, 3, 22, 16),
+      fullDay: false,
+      type: EntryType.WORK,
+    },
+    {
+      start: new Date(2021,3,21, 20,0),
+      end: new Date(2021, 3, 25, 20,0),
+      fullDay: false,
+      type: EntryType.WORK,
+    },
+    {
+      start: new Date(2021, 3, 9, 0),
+      end: new Date(2021, 3, 9, 24),
+      fullDay: true,
+      type: EntryType.OVERTIME,
+    },
+    {
+      start: new Date(2021, 2, 26, 0),
+      end: new Date(2021, 2, 26, 24),
+      fullDay: true,
+      type: EntryType.ILL,
+    },
+    {
+      start: new Date(2021, 2, 14, 0),
+      end: new Date(2021, 2, 14, 24),
+      fullDay: true,
+      type: EntryType.VACATION,
+    },
+  ];
+  mockDataEntries.forEach((entry) =>
+    TimeService.saveEntryForDate(entry.start, TimeService.calculateEntry(entry))
   );
 }
 
@@ -141,8 +205,19 @@ export default {
     calcOvertime() {
       return 40;
     },
-    calcToday() {
-      return 7;
+    getCurrentOrTodayEntry(): Entry {
+      const current = TimeService.getCurrentOrTodayEntry();
+      if (current == null) {
+        return {
+          start: new Date(),
+          fullDay: false,
+          type: EntryType.WORK,
+          overtime: new Duration(0, 0),
+          worktime: new Duration(0, 0),
+        };
+      }
+
+      return TimeService.calculateEntry(current);
     },
     switchLabelColor(day: Day) {
       return day.hasEntry && day.entry
@@ -155,8 +230,8 @@ export default {
           : "primary"
         : "medium";
     },
-    switchOvertimeColor(overtime: string) {
-      return overtime.startsWith("-") ? "danger" : "success";
+    switchOvertimeColor(overtime: Duration) {
+      return overtime.toString().startsWith("-") ? "danger" : "success";
     },
     formatTime(date: Date) {
       return date.toLocaleTimeString(navigator.language, {
@@ -166,7 +241,7 @@ export default {
     },
     formatWorkTime(worktime: string) {
       if (worktime) {
-        return worktime;
+        return worktime.toString();
       }
       return "0:00";
     },
@@ -175,45 +250,7 @@ export default {
     },
     loadMonths(): Month[] {
       const months: Month[] = [];
-      const mockDataEntries: Entry[] = [
-        {
-          overtime: "1:45",
-          start: new Date(2021, 3, 23, 7, 45),
-          end: new Date(2021, 3, 23, 18),
-          worktime: "9:45",
-          fullDay: false,
-          type: EntryType.WORK,
-        },
-        {
-          overtime: "1:30",
-          start: new Date(2021, 3, 22, 6),
-          end: new Date(2021, 3, 22, 16),
-          worktime: "9:30",
-          fullDay: false,
-          type: EntryType.WORK,
-        },
-        {
-          overtime: "-8:00",
-          start: new Date(2021, 3, 9, 0),
-          end: new Date(2021, 3, 9, 24),
-          fullDay: true,
-          type: EntryType.OVERTIME,
-        },
-        {
-          overtime: "0:00",
-          start: new Date(2021, 2, 26, 0),
-          end: new Date(2021, 2, 26, 24),
-          fullDay: true,
-          type: EntryType.ILL,
-        },
-        {
-          overtime: "0:00",
-          start: new Date(2021, 2, 14, 0),
-          end: new Date(2021, 2, 14, 24),
-          fullDay: true,
-          type: EntryType.VACATION,
-        },
-      ];
+      setupMockData();
 
       for (let monthModifier = 0; monthModifier < 12; monthModifier++) {
         const baseDate = new Date();
@@ -251,13 +288,14 @@ export default {
               onlyWeekDayOptions
             ),
             date: date.toLocaleDateString(navigator.language, onlyDayOptions),
-            hasEntry: mockDataEntries.some((entry) =>
-              isDateEqualsTimeIgnoring(entry.start, date)
-            ),
-            entry: mockDataEntries.find((entry) =>
-              isDateEqualsTimeIgnoring(entry.start, date)
-            ),
+            hasEntry: false,
           };
+          const dayEntry = TimeService.loadEntryForDate(date);
+
+          newDay.hasEntry = dayEntry != null;
+          if (newDay.hasEntry) {
+            newDay.entry = dayEntry!;
+          }
 
           currentMonth.days.push(newDay);
         }
