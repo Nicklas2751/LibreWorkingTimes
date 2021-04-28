@@ -14,10 +14,17 @@
               <span class="bold">Heute:</span>
             </ion-col>
             <ion-col class="ion-align-self-center" size="3">
-              {{ formatWorkTime(current.worktime) }}<br />
-              <ion-text :color="switchOvertimeColor(current.overtime)">{{
-                current.overtime.toString()
-              }}</ion-text>
+              {{
+                formatWorkTime(getDayEntry(getDayForDate(new Date())) ? this.worktime : "0:00")
+              }}<br />
+              <ion-text
+                :color="
+                  switchOvertimeColor(
+                    getDayEntry(getDayForDate(new Date())) ? this.overtime : undefined
+                  )
+                "
+                >{{ getDayEntry(getDayForDate(new Date())) ? this.overtime.toString() : "0:00" }}</ion-text
+              >
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -25,61 +32,70 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <!--  
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-grid>
-          <ion-row>
-            <ion-col class="ion-align-self-center" size="6">
-              Überstunden: 
-            </ion-col>
-            <ion-col class="ion-align-self-center" size="6">
-              Heute: 
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-        </ion-toolbar>
-      </ion-header> -->
-      <ion-list>
-        <ion-item-group v-bind:key="month.name" v-for="month in loadMonths()">
+      <ion-list ref="entryList">
+        <ion-item-group v-bind:key="month.name" v-for="month in months">
           <ion-item-divider color="primary" sticky
             >{{ month.name }} {{ month.year }}</ion-item-divider
           >
-          <ion-item v-for="day in month.days" v-bind:key="day.date">
-            <ion-grid>
-              <ion-row>
-                <ion-col size="4">
-                  <ion-label :color="switchLabelColor(day)">
-                    <div>{{ day.weekday }}.</div>
-                    <div class="bigger">
-                      {{ day.date }}
-                    </div>
-                  </ion-label>
-                </ion-col>
+          <ion-item-sliding v-for="day in month.days" v-bind:key="day.date">
+            <ion-item>
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="4">
+                    <ion-label :color="switchLabelColor(day)">
+                      <div>{{ day.weekday }}.</div>
+                      <div class="bigger">
+                        {{ day.date }}
+                      </div>
+                    </ion-label>
+                  </ion-col>
 
-                <ion-col size="4" v-if="day.hasEntry && getDayEntry(day)">
-                  <ion-text v-if="isWork(getDayEntry(day).type)">
-                    {{ formatTime(getDayEntry(day).start) }} -
-                    {{ formatTime(getDayEntry(day).end) }}
-                  </ion-text>
-                </ion-col>
+                  <ion-col size="4" v-if="getDayEntry(day)">
+                    <ion-text v-if="isWork(getDayEntry(day).type)">
+                      {{ formatTime(getDayEntry(day).start) }} -
+                      {{ formatTime(getDayEntry(day).end) }}
+                    </ion-text>
+                  </ion-col>
 
-                <ion-col
-                  size="4"
-                  class="ion-text-end"
-                  v-if="day.hasEntry && getDayEntry(day)"
-                >
-                  {{ formatWorkTime(getDayEntry(day).worktime) }}<br />
-                  <ion-text
-                    :color="switchOvertimeColor(getDayEntry(day).overtime)"
-                    >{{ getDayEntry(day).overtime.toString() }}</ion-text
+                  <ion-col
+                    size="4"
+                    class="ion-text-end"
+                    v-if="getDayEntry(day)"
                   >
-                </ion-col>
-              </ion-row>
-            </ion-grid>
-          </ion-item>
+                    {{ formatWorkTime(getDayEntry(day).worktime) }}<br />
+                    <ion-text
+                      :color="switchOvertimeColor(getDayEntry(day).overtime)"
+                      >{{ getDayEntry(day).overtime.toString() }}</ion-text
+                    >
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-item>
+            <ion-item-options side="end">
+              <ion-item-option
+                v-if="day.entry"
+                ion-item-option
+                color="danger"
+                expandable
+                @click="deleteEntryForDay(day)"
+                >Delete</ion-item-option
+              >
+            </ion-item-options>
+          </ion-item-sliding>
         </ion-item-group>
       </ion-list>
+
+      <ion-infinite-scroll
+        @ionInfinite="loadData($event)"
+        threshold="100px"
+        id="infinite-scroll"
+      >
+        <ion-infinite-scroll-content
+          loading-spinner="bubbles"
+          loading-text="Loading more data..."
+        >
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll>
     </ion-content>
   </ion-page>
 </template>
@@ -101,6 +117,11 @@ import {
   IonItemGroup,
   IonItemDivider,
   IonText,
+  IonInfiniteScroll,
+  IonInfiniteScrollContent,
+  IonItemOptions,
+  IonItemOption,
+  IonItemSliding,
 } from "@ionic/vue";
 import { Month, Day, Entry, EntryType, Duration } from "../types";
 import TimeService from "@/servies/times.service";
@@ -108,18 +129,6 @@ import { defineComponent } from "vue";
 
 function daysInMonth(month: number, year: number): number {
   return new Date(year, month, 0).getDate();
-}
-
-function isDateEqualsTimeIgnoring(firstDate: Date, secondDate: Date): boolean {
-  const dateEqualsOptions: Intl.DateTimeFormatOptions = {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  };
-  return (
-    firstDate.toLocaleDateString(navigator.language, dateEqualsOptions) ===
-    secondDate.toLocaleDateString(navigator.language, dateEqualsOptions)
-  );
 }
 
 function setupMockData() {
@@ -180,6 +189,8 @@ function setupMockData() {
 export default defineComponent({
   name: "Zeiten",
   interval: 1000,
+  months: [],
+  monthModifier: 0,
   components: {
     IonButtons,
     IonHeader,
@@ -196,15 +207,24 @@ export default defineComponent({
     IonItemGroup,
     IonItemDivider,
     IonText,
+    IonInfiniteScroll,
+    IonInfiniteScrollContent,
+    IonItemOptions,
+    IonItemOption,
+    IonItemSliding,
   },
   data() {
     return {
       title: "Zeiten",
+      months: [] as Month[],
       current: {} as Entry,
       interval: 1000,
+      monthModifier: 0,
     };
   },
   created() {
+    setupMockData();
+    this.loadNextMonth();
     this.getCurrentOrTodayEntry();
     this.interval = setInterval(this.getCurrentOrTodayEntry, 1000);
   },
@@ -213,7 +233,7 @@ export default defineComponent({
       return 40;
     },
     getDayEntry(day: Day): Entry | undefined {
-      if (day.hasEntry && day.entry) {
+      if (day.entry) {
         if (
           day.entry.start.toLocaleTimeString(navigator.language, {
             hour: "2-digit",
@@ -245,7 +265,7 @@ export default defineComponent({
       }
     },
     switchLabelColor(day: Day) {
-      return day.hasEntry && day.entry
+      return day.entry
         ? day.entry.type === EntryType.OVERTIME
           ? "warning"
           : day.entry.type === EntryType.VACATION
@@ -255,7 +275,11 @@ export default defineComponent({
           : "primary"
         : "medium";
     },
-    switchOvertimeColor(overtime: Duration) {
+    switchOvertimeColor(overtime: Duration | undefined) {
+      if(!overtime)
+      {
+        return "success";
+      }
       return overtime.toString().startsWith("-") ? "danger" : "success";
     },
     formatTime(date: Date | undefined) {
@@ -273,61 +297,75 @@ export default defineComponent({
     isWork(entryType: EntryType) {
       return entryType === EntryType.WORK;
     },
-    loadMonths(): Month[] {
-      const months: Month[] = [];
-      setupMockData();
-
-      for (let monthModifier = 0; monthModifier < 12; monthModifier++) {
-        const baseDate = new Date();
-        baseDate.setMonth(new Date().getMonth() - monthModifier);
-        const month = baseDate.getMonth();
-        const year = baseDate.getFullYear();
-
-        const onlyMonthNameOptions: Intl.DateTimeFormatOptions = {
-          month: "long",
-        };
-        const currentMonth: Month = {
-          name: new Date(year, month).toLocaleDateString(
-            navigator.language,
-            onlyMonthNameOptions
-          ),
-          year: baseDate.getFullYear(),
-          days: [],
-        };
-
-        const latestDay =
-          year === new Date().getFullYear() && month === new Date().getMonth()
-            ? new Date().getDate()
-            : daysInMonth(month, year) - 1;
-
-        for (let day = latestDay; day > 0; day--) {
-          const date = new Date(year, month, day);
-          const onlyWeekDayOptions: Intl.DateTimeFormatOptions = {
-            weekday: "short",
-          };
-          const onlyDayOptions: Intl.DateTimeFormatOptions = { day: "numeric" };
-
-          const newDay: Day = {
-            weekday: date.toLocaleDateString(
-              navigator.language,
-              onlyWeekDayOptions
-            ),
-            date: date.toLocaleDateString(navigator.language, onlyDayOptions),
-            hasEntry: false,
-          };
-          const dayEntry = TimeService.loadEntryForDate(date);
-
-          newDay.hasEntry = dayEntry != null;
-          if (newDay.hasEntry) {
-            newDay.entry = dayEntry!;
-          }
-
-          currentMonth.days.push(newDay);
+    loadData(event: CustomEvent) {
+      setTimeout(() => {
+        this.loadNextMonth();
+        console.log("Loaded data");
+        if (event.target) {
+          const test: typeof IonInfiniteScroll = (event.target as unknown) as typeof IonInfiniteScroll;
+          test.complete();
         }
-        months.push(currentMonth);
+      }, 500);
+    },
+    getDayForDate(date: Date): Day {
+      const onlyWeekDayOptions: Intl.DateTimeFormatOptions = {
+        weekday: "short",
+      };
+      const onlyDayOptions: Intl.DateTimeFormatOptions = { day: "numeric" };
+      const newDay: Day = {
+        weekday: date.toLocaleDateString(
+          navigator.language,
+          onlyWeekDayOptions
+        ),
+        date: date.toLocaleDateString(navigator.language, onlyDayOptions),
+      };
+      const dayEntry = TimeService.loadEntryForDate(date);
+
+      if (dayEntry != null) {
+        newDay.entry = dayEntry;
+      }
+      return newDay;
+    },
+    loadNextMonth() {
+      const baseDate = new Date();
+      baseDate.setMonth(new Date().getMonth() - this.monthModifier);
+      const month = baseDate.getMonth();
+      const year = baseDate.getFullYear();
+
+      const onlyMonthNameOptions: Intl.DateTimeFormatOptions = {
+        month: "long",
+      };
+      const currentMonth: Month = {
+        name: new Date(year, month).toLocaleDateString(
+          navigator.language,
+          onlyMonthNameOptions
+        ),
+        year: baseDate.getFullYear(),
+        days: [],
+      };
+
+      const latestDay =
+        year === new Date().getFullYear() && month === new Date().getMonth()
+          ? new Date().getDate()
+          : daysInMonth(month, year) - 1;
+
+      for (let day = latestDay; day > 0; day--) {
+        const date = new Date(year, month, day);
+        const newDay: Day = this.getDayForDate(date);
+
+        currentMonth.days.push(newDay);
+      }
+      this.months.push(currentMonth);
+
+      this.monthModifier++;
+    },
+    deleteEntryForDay(day: Day) {
+      if (day.entry) {
+        TimeService.deleteEntryForDate(day.entry.start);
+        day.entry = undefined;
       }
 
-      return months;
+      (this.$refs.entryList as typeof IonList).$el.closeSlidingItems();
     },
   },
 });

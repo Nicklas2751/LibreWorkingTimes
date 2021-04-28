@@ -54,6 +54,20 @@ const TimeService = {
 
     saveEntryForDate(date: Date, entry: Entry) {
         localStorage.setItem(STORAGE_KEY_ENTRY + dateToDateForSaving(date), JSON.stringify(entry));
+
+        const currentBefore: Entry | null = this.loadEntryFromJson(localStorage.getItem(STORAGE_KEY_ENTRY + "Current"));
+        if (currentBefore == null || currentBefore.start < date) {
+            localStorage.setItem(STORAGE_KEY_ENTRY + "Current", JSON.stringify(entry));
+        }
+    },
+
+    deleteEntryForDate(date: Date)
+    {
+        if(localStorage.getItem(STORAGE_KEY_ENTRY + "Current") === localStorage.getItem(STORAGE_KEY_ENTRY + dateToDateForSaving(date)))
+        {
+            localStorage.removeItem(STORAGE_KEY_ENTRY + "Current");
+        }
+        localStorage.removeItem(STORAGE_KEY_ENTRY + dateToDateForSaving(date));
     },
 
     /**
@@ -63,7 +77,7 @@ const TimeService = {
      */
     calculateEntry(entry: Entry): Entry {
         const hadEndBefore = entry.end ? true : false;
-        
+
         //Make an copy of the day to don't edit the given day directly
         const updatedEntry: Entry = Object.assign(entry);
 

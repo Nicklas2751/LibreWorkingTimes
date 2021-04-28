@@ -7,7 +7,6 @@ export interface Month {
 export interface Day {
     weekday: string;
     date: string;
-    hasEntry: boolean;
     entry?: Entry;
 }
 
