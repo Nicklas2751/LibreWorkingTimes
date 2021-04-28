@@ -14,11 +14,10 @@
               <span class="bold">Heute:</span>
             </ion-col>
             <ion-col class="ion-align-self-center" size="3">
-              {{ formatWorkTime(getCurrentOrTodayEntry().worktime) }}<br />
-              <ion-text
-                :color="switchOvertimeColor(getCurrentOrTodayEntry().overtime)"
-                >{{ getCurrentOrTodayEntry().overtime.toString() }}</ion-text
-              >
+              {{ formatWorkTime(current.worktime) }}<br />
+              <ion-text :color="switchOvertimeColor(current.overtime)">{{
+                current.overtime.toString()
+              }}</ion-text>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -58,22 +57,23 @@
                   </ion-label>
                 </ion-col>
 
-                <ion-col size="4" v-if="day.hasEntry && day.entry">
-                  <ion-text v-if="isWork(day.entry.type)">
-                    {{ formatTime(day.entry.start) }} -
-                    {{ formatTime(day.entry.end) }}
+                <ion-col size="4" v-if="day.hasEntry && getDayEntry(day)">
+                  <ion-text v-if="isWork(getDayEntry(day).type)">
+                    {{ formatTime(getDayEntry(day).start) }} -
+                    {{ formatTime(getDayEntry(day).end) }}
                   </ion-text>
                 </ion-col>
 
                 <ion-col
                   size="4"
                   class="ion-text-end"
-                  v-if="day.hasEntry && day.entry"
+                  v-if="day.hasEntry && getDayEntry(day)"
                 >
-                  {{ formatWorkTime(day.entry.worktime) }}<br />
-                  <ion-text :color="switchOvertimeColor(day.entry.overtime)">{{
-                    day.entry.overtime.toString()
-                  }}</ion-text>
+                  {{ formatWorkTime(getDayEntry(day).worktime) }}<br />
+                  <ion-text
+                    :color="switchOvertimeColor(getDayEntry(day).overtime)"
+                    >{{ getDayEntry(day).overtime.toString() }}</ion-text
+                  >
                 </ion-col>
               </ion-row>
             </ion-grid>
@@ -104,6 +104,7 @@ import {
 } from "@ionic/vue";
 import { Month, Day, Entry, EntryType, Duration } from "../types";
 import TimeService from "@/servies/times.service";
+import { defineComponent } from "vue";
 
 function daysInMonth(month: number, year: number): number {
   return new Date(year, month, 0).getDate();
@@ -124,14 +125,13 @@ function isDateEqualsTimeIgnoring(firstDate: Date, secondDate: Date): boolean {
 function setupMockData() {
   const mockDataEntries: Entry[] = [
     {
-      start: new Date(),
-      end: new Date(2021, 3, 27, 4,0),
+      start: new Date(2021, 3, 28, 19, 30),
       fullDay: false,
       type: EntryType.WORK,
     },
     {
-      start: new Date(2021,3,26, 19,0),
-      end: new Date(2021, 3, 26, 20,0),
+      start: new Date(2021, 3, 26, 19, 0),
+      end: new Date(2021, 3, 26, 20, 0),
       fullDay: false,
       type: EntryType.WORK,
     },
@@ -148,8 +148,8 @@ function setupMockData() {
       type: EntryType.WORK,
     },
     {
-      start: new Date(2021,3,21, 20,0),
-      end: new Date(2021, 3, 25, 20,0),
+      start: new Date(2021, 3, 21, 20, 0),
+      end: new Date(2021, 3, 25, 20, 0),
       fullDay: false,
       type: EntryType.WORK,
     },
@@ -177,8 +177,9 @@ function setupMockData() {
   );
 }
 
-export default {
+export default defineComponent({
   name: "Zeiten",
+  interval: 1000,
   components: {
     IonButtons,
     IonHeader,
@@ -199,25 +200,49 @@ export default {
   data() {
     return {
       title: "Zeiten",
+      current: {} as Entry,
+      interval: 1000,
     };
+  },
+  created() {
+    this.getCurrentOrTodayEntry();
+    this.interval = setInterval(this.getCurrentOrTodayEntry, 1000);
   },
   methods: {
     calcOvertime() {
       return 40;
     },
-    getCurrentOrTodayEntry(): Entry {
+    getDayEntry(day: Day): Entry | undefined {
+      if (day.hasEntry && day.entry) {
+        if (
+          day.entry.start.toLocaleTimeString(navigator.language, {
+            hour: "2-digit",
+            minute: "2-digit",
+          }) ===
+          this.current.start.toLocaleTimeString(navigator.language, {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        ) {
+          return this.current;
+        }
+        return day.entry;
+      }
+      return;
+    },
+    getCurrentOrTodayEntry() {
       const current = TimeService.getCurrentOrTodayEntry();
       if (current == null) {
-        return {
+        this.current = {
           start: new Date(),
           fullDay: false,
           type: EntryType.WORK,
           overtime: new Duration(0, 0),
           worktime: new Duration(0, 0),
         };
+      } else {
+        this.current = TimeService.calculateEntry(current);
       }
-
-      return TimeService.calculateEntry(current);
     },
     switchLabelColor(day: Day) {
       return day.hasEntry && day.entry
@@ -233,8 +258,8 @@ export default {
     switchOvertimeColor(overtime: Duration) {
       return overtime.toString().startsWith("-") ? "danger" : "success";
     },
-    formatTime(date: Date) {
-      return date.toLocaleTimeString(navigator.language, {
+    formatTime(date: Date | undefined) {
+      return (date ? date : new Date()).toLocaleTimeString(navigator.language, {
         hour: "2-digit",
         minute: "2-digit",
       });
@@ -305,7 +330,7 @@ export default {
       return months;
     },
   },
-};
+});
 </script>
 
 <style scoped>

@@ -62,6 +62,8 @@ const TimeService = {
      * @returns The day with calculated entry.
      */
     calculateEntry(entry: Entry): Entry {
+        const hadEndBefore = entry.end ? true : false;
+        
         //Make an copy of the day to don't edit the given day directly
         const updatedEntry: Entry = Object.assign(entry);
 
@@ -96,6 +98,11 @@ const TimeService = {
         }
         else {
             entry.overtime = new Duration(0, 0);
+        }
+
+        if(!hadEndBefore)
+        {
+            updatedEntry.end = undefined;
         }
 
         return updatedEntry;
