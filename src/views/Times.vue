@@ -15,15 +15,15 @@
             </ion-col>
             <ion-col class="ion-align-self-center" size="3">
               {{
-                formatWorkTime(getDayEntry(getDayForDate(new Date())) ? this.worktime : "0:00")
+                formatDuration(getDayEntry(getDayForDate(new Date())).worktime)
               }}<br />
               <ion-text
                 :color="
                   switchOvertimeColor(
-                    getDayEntry(getDayForDate(new Date())) ? this.overtime : undefined
+                    getDayEntry(getDayForDate(new Date())).overtime
                   )
                 "
-                >{{ getDayEntry(getDayForDate(new Date())) ? this.overtime.toString() : "0:00" }}</ion-text
+                >{{ formatDuration(getDayEntry(getDayForDate(new Date())).overtime) }}</ion-text
               >
             </ion-col>
           </ion-row>
@@ -62,7 +62,7 @@
                     class="ion-text-end"
                     v-if="getDayEntry(day)"
                   >
-                    {{ formatWorkTime(getDayEntry(day).worktime) }}<br />
+                    {{ formatDuration(getDayEntry(day).worktime) }}<br />
                     <ion-text
                       :color="switchOvertimeColor(getDayEntry(day).overtime)"
                       >{{ getDayEntry(day).overtime.toString() }}</ion-text
@@ -134,7 +134,7 @@ function daysInMonth(month: number, year: number): number {
 function setupMockData() {
   const mockDataEntries: Entry[] = [
     {
-      start: new Date(2021, 3, 28, 19, 30),
+      start: new Date(2021, 4, 1, 6, 0),
       fullDay: false,
       type: EntryType.WORK,
     },
@@ -225,6 +225,7 @@ export default defineComponent({
   created() {
     setupMockData();
     this.loadNextMonth();
+    this.loadNextMonth();
     this.getCurrentOrTodayEntry();
     this.interval = setInterval(this.getCurrentOrTodayEntry, 1000);
   },
@@ -288,9 +289,9 @@ export default defineComponent({
         minute: "2-digit",
       });
     },
-    formatWorkTime(worktime: string) {
-      if (worktime) {
-        return worktime.toString();
+    formatDuration(duration: Duration | undefined): string {
+      if (duration) {
+        return duration.toString();
       }
       return "0:00";
     },
