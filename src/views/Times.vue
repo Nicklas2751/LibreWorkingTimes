@@ -37,15 +37,15 @@
           <ion-item-divider color="primary" sticky
             >{{ month.name }} {{ month.year }}</ion-item-divider
           >
-          <ion-item-sliding v-for="day in month.days" v-bind:key="day.date">
-            <ion-item>
+          <ion-item-sliding v-for="day in month.days" v-bind:key="day.day">
+            <ion-item @click="openAddEditModal(day)">
               <ion-grid>
                 <ion-row>
                   <ion-col size="4">
                     <ion-label :color="switchLabelColor(day)">
                       <div>{{ day.weekday }}.</div>
                       <div class="bigger">
-                        {{ day.date }}
+                        {{ day.day }}
                       </div>
                     </ion-label>
                   </ion-col>
@@ -122,10 +122,12 @@ import {
   IonItemOptions,
   IonItemOption,
   IonItemSliding,
+  modalController,
 } from "@ionic/vue";
 import { Month, Day, Entry, EntryType, Duration } from "../types";
 import TimeService from "@/servies/times.service";
 import { defineComponent } from "vue";
+import TimeAddAndEditModalVue from "./TimeAddAndEditModal.vue";
 
 function daysInMonth(month: number, year: number): number {
   return new Date(year, month, 0).getDate();
@@ -318,7 +320,8 @@ export default defineComponent({
           navigator.language,
           onlyWeekDayOptions
         ),
-        date: date.toLocaleDateString(navigator.language, onlyDayOptions),
+        day: date.toLocaleDateString(navigator.language, onlyDayOptions),
+        date: date
       };
       const dayEntry = TimeService.loadEntryForDate(date);
 
@@ -327,7 +330,7 @@ export default defineComponent({
       }
       return newDay;
     },
-    loadNextMonth() {
+    async loadNextMonth() {
       const baseDate = new Date();
       baseDate.setMonth(new Date().getMonth() - this.monthModifier);
       const month = baseDate.getMonth();
@@ -360,7 +363,7 @@ export default defineComponent({
 
       this.monthModifier++;
     },
-    deleteEntryForDay(day: Day) {
+    async deleteEntryForDay(day: Day) {
       if (day.entry) {
         TimeService.deleteEntryForDate(day.entry.start);
         day.entry = undefined;
@@ -368,6 +371,18 @@ export default defineComponent({
 
       (this.$refs.entryList as typeof IonList).$el.closeSlidingItems();
     },
+    async openAddEditModal(day: Day) {
+      const addEditModal = await modalController.create({
+        component: TimeAddAndEditModalVue,
+        componentProps: {
+          day: day,
+          dismiss: () => {
+            addEditModal.dismiss();
+          }
+        },
+      });
+      return addEditModal.present();
+    }
   },
 });
 </script>

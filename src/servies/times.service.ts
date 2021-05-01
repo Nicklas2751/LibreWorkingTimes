@@ -1,5 +1,5 @@
 
-import { Day, Entry, EntryType, Duration } from "../types";
+import { Entry, EntryType, Duration } from "../types";
 import moment from "moment";
 import SettingsService from "./settings.service";
 
@@ -7,12 +7,12 @@ const STORAGE_KEY_ENTRY = "WorkTimeEntry";
 
 function calcDurationFromMinutes(completeMinutes: number): Duration {
 
-    const hours = (completeMinutes < 0 ? -completeMinutes : completeMinutes)  / 60;
+    const hours = (completeMinutes < 0 ? -completeMinutes : completeMinutes) / 60;
     const roundedHours = Math.floor(hours);
 
     const minutes = (hours - roundedHours) * 60;
     const roundedMinutes = Math.round(minutes);
-    return new Duration(completeMinutes <0 ? -roundedHours : roundedHours, roundedMinutes);
+    return new Duration(completeMinutes < 0 ? -roundedHours : roundedHours, roundedMinutes);
 }
 
 const dateForSavingOptions: Intl.DateTimeFormatOptions = { day: "2-digit", month: "2-digit", year: "numeric" };
@@ -21,8 +21,13 @@ function dateToDateForSaving(date: Date) {
     return date.toLocaleDateString(navigator.language, dateForSavingOptions);
 }
 
+function durationToMomentJSDuration(duration: Duration) {
+    return moment.duration(duration.hours, "hours").add(duration.minutes, "minutes");
+}
+
+
 function calculateOvertime(momentDuration: moment.Duration, duration: Duration): moment.Duration {
-    const durationAsMomentDuration = moment.duration(duration.hours, "hours").add(duration.minutes, "minutes");
+    const durationAsMomentDuration = durationToMomentJSDuration(duration);
     return momentDuration.subtract(durationAsMomentDuration);
 }
 
@@ -61,10 +66,8 @@ const TimeService = {
         }
     },
 
-    deleteEntryForDate(date: Date)
-    {
-        if(localStorage.getItem(STORAGE_KEY_ENTRY + "Current") === localStorage.getItem(STORAGE_KEY_ENTRY + dateToDateForSaving(date)))
-        {
+    deleteEntryForDate(date: Date) {
+        if (localStorage.getItem(STORAGE_KEY_ENTRY + "Current") === localStorage.getItem(STORAGE_KEY_ENTRY + dateToDateForSaving(date))) {
             localStorage.removeItem(STORAGE_KEY_ENTRY + "Current");
         }
         localStorage.removeItem(STORAGE_KEY_ENTRY + dateToDateForSaving(date));
@@ -81,8 +84,7 @@ const TimeService = {
         //Make an copy of the day to don't edit the given day directly
         const updatedEntry: Entry = Object.assign(entry);
 
-        if(!updatedEntry.end)
-        {
+        if (!updatedEntry.end) {
             updatedEntry.end = new Date();
         }
 
@@ -91,16 +93,15 @@ const TimeService = {
 
         if (updatedEntry.type === EntryType.WORK) {
             let worktimeDuration: moment.Duration;
-            
-            if(updatedEntry.start < updatedEntry.end)
-            {
+
+            if (updatedEntry.start < updatedEntry.end) {
                 worktimeDuration = moment.duration(moment(updatedEntry.end).diff(moment(updatedEntry.start)));
-            }else {
+            } else {
                 worktimeDuration = moment.duration(moment(updatedEntry.start).diff(moment(updatedEntry.end)));
             }
 
             worktimeDuration = calculateOvertime(worktimeDuration, dailyPausetime);
-            
+
 
             updatedEntry.worktime = calcDurationFromMinutes(worktimeDuration.asMinutes());
             updatedEntry.overtime = calcDurationFromMinutes(calculateOvertime(worktimeDuration, dailyWorktime).asMinutes());
@@ -114,8 +115,7 @@ const TimeService = {
             entry.overtime = new Duration(0, 0);
         }
 
-        if(!hadEndBefore)
-        {
+        if (!hadEndBefore) {
             updatedEntry.end = undefined;
         }
 
@@ -126,8 +126,16 @@ const TimeService = {
         const entry = this.loadEntryFromJson(entryJson);
         return entry == null ? this.loadEntryForDate(new Date()) : entry;
     },
+    calculatePerfectEnd(start: Date): Date {
+        const dailyWorktime: Duration = SettingsService.getNeededDailyWorktime();
+        const dailyPausetime: Duration = SettingsService.getDailyPausetime();
+
+        const totalDailyDuration: moment.Duration = durationToMomentJSDuration(dailyWorktime).add(durationToMomentJSDuration(dailyPausetime));
+        return moment(start).add(totalDailyDuration).toDate();
+    },
 
 }
 
 
 export default TimeService;
+

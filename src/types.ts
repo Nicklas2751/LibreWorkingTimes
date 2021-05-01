@@ -6,7 +6,8 @@ export interface Month {
 
 export interface Day {
     weekday: string;
-    date: string;
+    day: string;
+    date: Date;
     entry?: Entry;
 }
 
