@@ -14,6 +14,8 @@ function calcDurationFromMinutes(completeMinutes: number): Duration {
     const roundedMinutes = Math.round(minutes);
     return new Duration(completeMinutes < 0 ? -roundedHours : roundedHours, roundedMinutes);
 }
+//TODO save oldest and newest date for statistics and to show things in future always
+// also scroll to today
 
 const dateForSavingOptions: Intl.DateTimeFormatOptions = { day: "2-digit", month: "2-digit", year: "numeric" };
 
@@ -48,7 +50,11 @@ const TimeService = {
                 entry.end = new Date(entry.end);
             }
             if (entry.worktime) {
-                entry.worktime = new Duration(entry.worktime.hours, entry.worktime.hours);
+                entry.worktime = new Duration(entry.worktime.hours, entry.worktime.minutes);
+            }
+            if(entry.overtime)
+            {
+                entry.overtime = new Duration(entry.overtime.hours,entry.overtime.minutes)
             }
             entry = TimeService.calculateEntry(entry);
 
@@ -109,7 +115,10 @@ const TimeService = {
             updatedEntry.worktime = calcDurationFromMinutes(worktimeDuration.asMinutes());
             updatedEntry.overtime = calcDurationFromMinutes(calculateOvertime(worktimeDuration, dailyWorktime).asMinutes());
         } else if (updatedEntry.type === EntryType.OVERTIME) {
-            entry.overtime = new Duration(-dailyWorktime.hours, dailyWorktime.minutes);
+            if(!entry.overtime)
+            {
+                entry.overtime = new Duration(-dailyWorktime.hours, dailyWorktime.minutes);
+            }
         } else if (updatedEntry.type === EntryType.ILL) {
             entry.worktime = new Duration(dailyWorktime.hours, dailyWorktime.minutes);
             entry.overtime = new Duration(0, 0);

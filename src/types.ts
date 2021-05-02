@@ -42,3 +42,7 @@ export class Duration {
     }
 
 }
+
+export enum OvertimeMode {
+    ADD, REMOVE
+}

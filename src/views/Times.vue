@@ -302,7 +302,6 @@ export default defineComponent({
     loadData(event: CustomEvent) {
       setTimeout(() => {
         this.loadNextMonth();
-        console.log("Loaded data");
         if (event.target) {
           const test: typeof IonInfiniteScroll = (event.target as unknown) as typeof IonInfiniteScroll;
           test.complete();
@@ -379,7 +378,10 @@ export default defineComponent({
             addEditModal.dismiss();
           },
           saveDayEntry: (entry: Entry) => {
+            if(day.entry){
+            day.entry.overtime = entry.overtime;}
             day.entry = entry;
+            
             this.getCurrentOrTodayEntry();
           },
         },
