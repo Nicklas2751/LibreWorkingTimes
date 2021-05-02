@@ -61,7 +61,10 @@ const TimeService = {
         localStorage.setItem(STORAGE_KEY_ENTRY + dateToDateForSaving(date), JSON.stringify(entry));
 
         const currentBefore: Entry | null = this.loadEntryFromJson(localStorage.getItem(STORAGE_KEY_ENTRY + "Current"));
-        if (currentBefore == null || currentBefore.start < date) {
+
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        if (currentBefore == null || currentBefore.start < date && date < tomorrow) {
             localStorage.setItem(STORAGE_KEY_ENTRY + "Current", JSON.stringify(entry));
         }
     },

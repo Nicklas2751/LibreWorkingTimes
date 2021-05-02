@@ -16,16 +16,8 @@
             <ion-col class="ion-align-self-center" size="3">
               {{ formatDuration(getWorktimeForDate(new Date())) }}<br />
               <ion-text
-                :color="
-                  switchOvertimeColor(
-                    getOvertimeForDate(new Date())
-                  )
-                "
-                >{{
-                  formatDuration(
-                    getOvertimeForDate(new Date())
-                  )
-                }}</ion-text
+                :color="switchOvertimeColor(getOvertimeForDate(new Date()))"
+                >{{ formatDuration(getOvertimeForDate(new Date())) }}</ion-text
               >
             </ion-col>
           </ion-row>
@@ -190,6 +182,21 @@ function setupMockData() {
   );
 }
 
+function isSameDate(first: Date, second: Date) {
+  return (
+    first.toLocaleTimeString(navigator.language, {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }) ===
+    second.toLocaleTimeString(navigator.language, {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })
+  );
+}
+
 export default defineComponent({
   name: "Zeiten",
   interval: 1000,
@@ -239,16 +246,7 @@ export default defineComponent({
     },
     getDayEntry(day: Day): Entry | undefined {
       if (day.entry) {
-        if (
-          day.entry.start.toLocaleTimeString(navigator.language, {
-            hour: "2-digit",
-            minute: "2-digit",
-          }) ===
-          this.current.start.toLocaleTimeString(navigator.language, {
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-        ) {
+        if (isSameDate(day.entry.start, this.current.start)) {
           return this.current;
         }
         return day.entry;
@@ -381,21 +379,26 @@ export default defineComponent({
             addEditModal.dismiss();
           },
           saveDayEntry: (entry: Entry) => {
-            day.entry =  entry;
-          }
+            day.entry = entry;
+            this.getCurrentOrTodayEntry();
+          },
         },
       });
       return addEditModal.present();
     },
     getWorktimeForDate(date: Date) {
-      const dateEntry: Entry | undefined = this.getDayEntry(this.getDayForDate(date));
+      const dateEntry: Entry | undefined = this.getDayEntry(
+        this.getDayForDate(date)
+      );
       if (dateEntry) {
         return dateEntry.worktime;
       }
       return undefined;
     },
     getOvertimeForDate(date: Date) {
-      const dateEntry: Entry | undefined = this.getDayEntry(this.getDayForDate(date));
+      const dateEntry: Entry | undefined = this.getDayEntry(
+        this.getDayForDate(date)
+      );
       if (dateEntry) {
         return dateEntry.overtime;
       }

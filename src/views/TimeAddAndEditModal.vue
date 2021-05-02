@@ -110,8 +110,11 @@ export default defineComponent({
     getEntry(): Entry {
       if (this.day.entry) {
         //Deep clone to avoid changing dates when not saving
-        const entry = JSON.parse(JSON.stringify(this.day.entry));
-        if (!entry.end) {
+        const entry: Entry = JSON.parse(JSON.stringify(this.day.entry));
+        entry.start = new Date(entry.start);
+        if (entry.end) {
+          entry.end = new Date(entry.end);
+        } else {
           entry.end = this.getEndDateTime(this.day, entry.pausetime);
         }
         return entry;
