@@ -14,16 +14,18 @@
               <span class="bold">Heute:</span>
             </ion-col>
             <ion-col class="ion-align-self-center" size="3">
-              {{
-                formatDuration(getDayEntry(getDayForDate(new Date())).worktime)
-              }}<br />
+              {{ formatDuration(getWorktimeForDate(new Date())) }}<br />
               <ion-text
                 :color="
                   switchOvertimeColor(
-                    getDayEntry(getDayForDate(new Date())).overtime
+                    getOvertimeForDate(new Date())
                   )
                 "
-                >{{ formatDuration(getDayEntry(getDayForDate(new Date())).overtime) }}</ion-text
+                >{{
+                  formatDuration(
+                    getOvertimeForDate(new Date())
+                  )
+                }}</ion-text
               >
             </ion-col>
           </ion-row>
@@ -279,8 +281,7 @@ export default defineComponent({
         : "medium";
     },
     switchOvertimeColor(overtime: Duration | undefined) {
-      if(!overtime)
-      {
+      if (!overtime) {
         return "success";
       }
       return overtime.toString().startsWith("-") ? "danger" : "success";
@@ -321,7 +322,7 @@ export default defineComponent({
           onlyWeekDayOptions
         ),
         day: date.toLocaleDateString(navigator.language, onlyDayOptions),
-        date: date
+        date: date,
       };
       const dayEntry = TimeService.loadEntryForDate(date);
 
@@ -378,11 +379,28 @@ export default defineComponent({
           day: day,
           dismiss: () => {
             addEditModal.dismiss();
+          },
+          saveDayEntry: (entry: Entry) => {
+            day.entry =  entry;
           }
         },
       });
       return addEditModal.present();
-    }
+    },
+    getWorktimeForDate(date: Date) {
+      const dateEntry: Entry | undefined = this.getDayEntry(this.getDayForDate(date));
+      if (dateEntry) {
+        return dateEntry.worktime;
+      }
+      return undefined;
+    },
+    getOvertimeForDate(date: Date) {
+      const dateEntry: Entry | undefined = this.getDayEntry(this.getDayForDate(date));
+      if (dateEntry) {
+        return dateEntry.overtime;
+      }
+      return undefined;
+    },
   },
 });
 </script>

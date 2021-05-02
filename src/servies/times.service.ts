@@ -126,9 +126,9 @@ const TimeService = {
         const entry = this.loadEntryFromJson(entryJson);
         return entry == null ? this.loadEntryForDate(new Date()) : entry;
     },
-    calculatePerfectEnd(start: Date): Date {
+    calculatePerfectEnd(start: Date, pausetime?: Duration | undefined): Date {
         const dailyWorktime: Duration = SettingsService.getNeededDailyWorktime();
-        const dailyPausetime: Duration = SettingsService.getDailyPausetime();
+        const dailyPausetime: Duration = pausetime ? pausetime : SettingsService.getDailyPausetime();
 
         const totalDailyDuration: moment.Duration = durationToMomentJSDuration(dailyWorktime).add(durationToMomentJSDuration(dailyPausetime));
         return moment(start).add(totalDailyDuration).toDate();

@@ -19,7 +19,8 @@
         <ion-datetime
           display-format="DD.MM.YYYY HH:mm"
           picker-format="DD.MM.YYYY HH:mm"
-          :value="getStartDateTime(day).toString()"
+          :value="entry.start.toString()"
+          @ionChange="changeEntryStart"
         ></ion-datetime>
       </ion-item>
       <ion-item>
@@ -27,7 +28,8 @@
         <ion-datetime
           display-format="DD.MM.YYYY HH:mm"
           picker-format="DD.MM.YYYY HH:mm"
-          :value="getEndDateTime(day).toString()"
+          :value="entry.end.toString()"
+          @ionChange="changeEntryEnd"
         ></ion-datetime>
       </ion-item>
     </ion-list>
@@ -42,6 +44,10 @@ import {
   IonToolbar,
   IonButton,
   IonButtons,
+  IonItem,
+  IonList,
+  IonLabel,
+  IonDatetime,
 } from "@ionic/vue";
 import { Day, Duration, Entry, EntryType } from "../types";
 import { defineComponent, PropType } from "vue";
@@ -56,15 +62,24 @@ export default defineComponent({
     IonToolbar,
     IonButton,
     IonButtons,
+    IonItem,
+    IonList,
+    IonLabel,
+    IonDatetime,
   },
   props: {
     day: { type: Object as PropType<Day>, default: undefined },
     dismiss: { type: Function },
+    saveDayEntry: { type: Function },
   },
   data() {
     return {
       content: "Content",
+      entry: (undefined as unknown) as Entry,
     };
+  },
+  created() {
+    this.entry = this.getEntry();
   },
   methods: {
     getStartDateTime(day: Day): Date {
@@ -73,14 +88,61 @@ export default defineComponent({
       }
 
       const dayDate = new Date(day.date);
-      dayDate.setTime(new Date().getTime());
+      const current = new Date();
+
+      dayDate.setHours(current.getHours());
+      dayDate.setMinutes(current.getMinutes());
+      dayDate.setSeconds(current.getSeconds());
+      dayDate.setMilliseconds(current.getMilliseconds());
+
       return dayDate;
     },
     getEndDateTime(day: Day, pausetime?: Duration | undefined): Date {
       if (day.entry && day.entry.end) {
         return day.entry.end;
       }
-      return TimeService.calculatePerfectEnd(this.getStartDateTime(day));
+
+      return TimeService.calculatePerfectEnd(
+        this.getStartDateTime(day),
+        pausetime
+      );
+    },
+    getEntry(): Entry {
+      if (this.day.entry) {
+        //Deep clone to avoid changing dates when not saving
+        const entry = JSON.parse(JSON.stringify(this.day.entry));
+        if (!entry.end) {
+          entry.end = this.getEndDateTime(this.day, entry.pausetime);
+        }
+        return entry;
+      }
+      return {
+        start: this.getStartDateTime(this.day),
+        fullDay: false,
+        type: EntryType.WORK,
+        end: this.getEndDateTime(this.day),
+      };
+    },
+    save() {
+      const calculatedEntry = TimeService.calculateEntry(this.entry);
+      TimeService.saveEntryForDate(this.entry.start, calculatedEntry);
+
+      if (this.saveDayEntry) {
+        this.saveDayEntry(calculatedEntry);
+      }
+      if (this.dismiss) {
+        this.dismiss();
+      }
+    },
+    changeEntryStart(event: CustomEvent) {
+      this.entry.start = new Date(event.detail.value);
+      this.entry.end = TimeService.calculatePerfectEnd(
+        this.entry.start,
+        this.entry.pausetime
+      );
+    },
+    changeEntryEnd(event: CustomEvent) {
+      this.entry.end = new Date(event.detail.value);
     },
   },
   computed: {
@@ -90,24 +152,6 @@ export default defineComponent({
             " " +
             this.day.date.toLocaleDateString(navigator.language)
         : "";
-    },
-    entry(): Entry {
-      if (this.day.entry) {
-        if (!this.day.entry.end) {
-            this.day.entry.end = this.getEndDateTime(
-            this.day,
-            this.day.entry.pausetime
-          );
-        }
-        return this.day.entry;
-      }
-
-      return {
-        start: this.getStartDateTime(this.day),
-        fullDay: false,
-        type: EntryType.WORK,
-        end: this.getEndDateTime(this.day),
-      };
     },
   },
 });
