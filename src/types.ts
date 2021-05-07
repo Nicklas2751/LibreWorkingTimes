@@ -38,7 +38,7 @@ export class Duration {
     }
 
     public toString(): string {
-        return this.hours + ":" + ((this.minutes < 10) ? "0" : "") + this.minutes;
+        return this.hours + ":" + ((this.minutes < 10 && this.minutes >= 0) ? "0" : "") + (this.minutes < 0 ? this.minutes*-1 : this.minutes);
     }
 
 }

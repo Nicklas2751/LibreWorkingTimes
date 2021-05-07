@@ -8,7 +8,7 @@
         <ion-grid>
           <ion-row>
             <ion-col class="ion-align-self-center" size="6">
-              <span class="bold">Überstunden:</span> {{ calcOvertime() }}
+              <span class="bold">Überstunden:</span> {{ completeOvertime }}
             </ion-col>
             <ion-col class="ion-align-self-center" size="3">
               <span class="bold">Heute:</span>
@@ -229,6 +229,7 @@ export default defineComponent({
       title: "Zeiten",
       months: [] as Month[],
       current: {} as Entry,
+      completeOvertime: "",
       interval: 1000,
       monthModifier: 0,
     };
@@ -237,12 +238,12 @@ export default defineComponent({
     setupMockData();
     this.loadNextMonth();
     this.loadNextMonth();
-    this.getTodayEntry();
-    this.interval = setInterval(this.getTodayEntry, 1000);
+    this.loadStatistics();
+    this.interval = setInterval(this.loadStatistics, 1000);
   },
   methods: {
-    calcOvertime() {
-      return 40;
+    loadCompleteOvertime() {
+      this.completeOvertime = this.formatDuration(TimeService.calculateOvertimeComplete());
     },
     getDayEntry(day: Day): Entry | undefined {
       if (day.entry) {
@@ -252,6 +253,10 @@ export default defineComponent({
         return day.entry;
       }
       return;
+    },
+    loadStatistics() {
+      this.getTodayEntry();
+      this.loadCompleteOvertime();
     },
     getTodayEntry() {
       const current = TimeService.loadEntryForDate(new Date());

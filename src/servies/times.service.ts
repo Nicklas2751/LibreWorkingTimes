@@ -141,7 +141,6 @@ const TimeService = {
                 const entry: Entry | null = this.loadEntryForDate(date);
                 if (entry != null) {
                     newOldestDate = new Date(date);
-
                 }
             }
         }
@@ -162,7 +161,6 @@ const TimeService = {
                 const entry: Entry | null = this.loadEntryForDate(date);
                 if (entry != null) {
                     newNewestDate = new Date(date);
-
                 }
             }
         }
@@ -230,6 +228,26 @@ const TimeService = {
 
         const totalDailyDuration: moment.Duration = durationToMomentJSDuration(dailyWorktime).add(durationToMomentJSDuration(dailyPausetime));
         return moment(start).add(totalDailyDuration).toDate();
+    },
+    calculateOvertimeForTimeRange(start: Date, end: Date): Duration {
+        const overtime = moment.duration(0);
+        for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+            const entry: Entry | null = this.loadEntryForDate(date);
+            if (entry != null && entry.overtime) {
+                overtime.add(entry.overtime);
+            }
+        }
+        return calcDurationFromMinutes(overtime.asMinutes());
+    },
+    calculateOvertimeComplete(): Duration {
+        const oldestDate = this.loadOldestDate();
+        const newestDate = this.loadNewestDate();
+        if(oldestDate == null || newestDate == null)
+        {
+            return new Duration(0,0);
+        }
+
+        return this.calculateOvertimeForTimeRange(oldestDate,newestDate);
     },
 
 }
