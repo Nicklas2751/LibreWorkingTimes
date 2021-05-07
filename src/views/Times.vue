@@ -14,10 +14,10 @@
               <span class="bold">Heute:</span>
             </ion-col>
             <ion-col class="ion-align-self-center" size="3">
-              {{ formatDuration(getWorktimeForDate(new Date())) }}<br />
+              {{ formatDuration(current.worktime) }}<br />
               <ion-text
-                :color="switchOvertimeColor(getOvertimeForDate(new Date()))"
-                >{{ formatDuration(getOvertimeForDate(new Date())) }}</ion-text
+                :color="switchOvertimeColor(current.overtime)"
+                >{{ formatDuration(current.overtime) }}</ion-text
               >
             </ion-col>
           </ion-row>
@@ -129,11 +129,11 @@ function daysInMonth(month: number, year: number): number {
 
 function setupMockData() {
   const mockDataEntries: Entry[] = [
-    {
+    /*{
       start: new Date(2021, 4, 1, 6, 0),
       fullDay: false,
       type: EntryType.WORK,
-    },
+    },*/
     {
       start: new Date(2021, 3, 26, 19, 0),
       end: new Date(2021, 3, 26, 20, 0),
@@ -237,8 +237,8 @@ export default defineComponent({
     setupMockData();
     this.loadNextMonth();
     this.loadNextMonth();
-    this.getCurrentOrTodayEntry();
-    this.interval = setInterval(this.getCurrentOrTodayEntry, 1000);
+    this.getTodayEntry();
+    this.interval = setInterval(this.getTodayEntry, 1000);
   },
   methods: {
     calcOvertime() {
@@ -253,8 +253,8 @@ export default defineComponent({
       }
       return;
     },
-    getCurrentOrTodayEntry() {
-      const current = TimeService.getCurrentOrTodayEntry();
+    getTodayEntry() {
+      const current = TimeService.loadEntryForDate(new Date());
       if (current == null) {
         this.current = {
           start: new Date(),
@@ -382,7 +382,7 @@ export default defineComponent({
             day.entry.overtime = entry.overtime;}
             day.entry = entry;
             
-            this.getCurrentOrTodayEntry();
+            this.getTodayEntry();
           },
         },
       });

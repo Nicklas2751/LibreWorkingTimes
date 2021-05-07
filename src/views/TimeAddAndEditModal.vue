@@ -59,7 +59,8 @@
         ></ion-datetime>
       </ion-item>
       <ion-item v-if="entry.type === EntryType.OVERTIME && !entry.fullDay">
-        <ion-label>Day</ion-label>
+        <ion-label>Overtime amount</ion-label>
+        
         <ion-datetime
           display-format="HH:mm"
           picker-format="HH:mm"
