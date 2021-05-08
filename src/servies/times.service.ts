@@ -188,25 +188,29 @@ const TimeService = {
         }
 
         const dailyWorktime: Duration = SettingsService.getNeededDailyWorktime();
-        const dailyPausetime: Duration = SettingsService.getDailyPausetime();
 
         if (updatedEntry.type === EntryType.WORK) {
+
+            if (!entry.pausetime) {
+                entry.pausetime = SettingsService.getDailyPausetime();
+            }
+
             let worktimeDuration: moment.Duration;
 
             //if (updatedEntry.start < updatedEntry.end) {
-                worktimeDuration = moment.duration(moment(updatedEntry.end).diff(moment(updatedEntry.start)));
+            worktimeDuration = moment.duration(moment(updatedEntry.end).diff(moment(updatedEntry.start)));
             /*} else {
                 worktimeDuration = moment.duration(moment(updatedEntry.start).diff(moment(updatedEntry.end)));
             }*/
 
-            worktimeDuration = calculateOvertime(worktimeDuration, dailyPausetime);
+            worktimeDuration = calculateOvertime(worktimeDuration, entry.pausetime);
 
 
             updatedEntry.worktime = calcDurationFromMinutes(worktimeDuration.asMinutes());
             updatedEntry.overtime = calcDurationFromMinutes(calculateOvertime(worktimeDuration, dailyWorktime).asMinutes());
         } else if (updatedEntry.type === EntryType.OVERTIME) {
             if (!entry.overtime) {
-                entry.overtime = new Duration(-dailyWorktime.hours, dailyWorktime.minutes,true);
+                entry.overtime = new Duration(-dailyWorktime.hours, dailyWorktime.minutes, true);
             }
         } else if (updatedEntry.type === EntryType.ILL) {
             entry.worktime = new Duration(dailyWorktime.hours, dailyWorktime.minutes);
@@ -242,12 +246,11 @@ const TimeService = {
     calculateOvertimeComplete(): Duration {
         const oldestDate = this.loadOldestDate();
         const newestDate = this.loadNewestDate();
-        if(oldestDate == null || newestDate == null)
-        {
-            return new Duration(0,0);
+        if (oldestDate == null || newestDate == null) {
+            return new Duration(0, 0);
         }
 
-        return this.calculateOvertimeForTimeRange(oldestDate,newestDate);
+        return this.calculateOvertimeForTimeRange(oldestDate, newestDate);
     },
 
 }

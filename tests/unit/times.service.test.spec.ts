@@ -66,6 +66,28 @@ describe('times.service.ts', () => {
             //THEN
             expect(calculated.worktime).toMatchObject<Duration>(new Duration(1, 30));
         }),
+        it('calculate positive work entry worktime changed pausetime', () => {
+
+            //GIVEN
+            const currentDateTime: Date = new Date();
+            const currentDateThirtyMinutesLater: Date = new Date(currentDateTime);
+            currentDateThirtyMinutesLater.setMinutes(currentDateTime.getMinutes() + 120);
+
+            const testEntry: Entry = {
+                fullDay: false,
+                start: currentDateTime,
+                end: currentDateThirtyMinutesLater,
+                type: EntryType.WORK,
+                pausetime: new Duration(0,15),
+            };
+
+
+            //WHEN
+            const calculated = TimeService.calculateEntry(testEntry);
+
+            //THEN
+            expect(calculated.worktime).toMatchObject<Duration>(new Duration(1, 45));
+        }),
 
         it('calculate negative work entry worktime minutes', () => {
 
