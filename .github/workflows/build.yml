@@ -68,11 +68,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 15.x
-      - name: Cache node_modules
-        uses: actions/cache@v2.1.5
-        with:
-          path: node_modules
-          key: ubuntu-latest-node-v15.x-deps-${{ hashFiles(format('{0}{1}', github.workspace, '/package-lock.json')) }}
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
