@@ -75,18 +75,14 @@ jobs:
           key: ubuntu-latest-node-v15.x-deps-${{ hashFiles(format('{0}{1}', github.workspace, '/package-lock.json')) }}
       - run: npx cypress install
       - name: Run E2E tests 🧪
-        uses: cypress-io/github-action@v2
-        with:
-          install: false
-          record: true
-          #command: npm run test:e2e
+        run: npm run test:e2e
       - uses: actions/upload-artifact@v1
         if: failure()
         with:
           name: cypress-screenshots
-          path: cypress/screenshots
+          path: tests/e2e/screenshots
       - uses: actions/upload-artifact@v1
         if: always()
         with:
           name: cypress-videos
-          path: cypress/videos
+          path: tests/e2e/videos
