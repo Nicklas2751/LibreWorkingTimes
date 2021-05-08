@@ -15,10 +15,9 @@
             </ion-col>
             <ion-col class="ion-align-self-center" size="3">
               {{ formatDuration(current.worktime) }}<br />
-              <ion-text
-                :color="switchOvertimeColor(current.overtime)"
-                >{{ formatDuration(current.overtime) }}</ion-text
-              >
+              <ion-text :color="switchOvertimeColor(current.overtime)">{{
+                formatDuration(current.overtime)
+              }}</ion-text>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -91,6 +90,12 @@
         </ion-infinite-scroll-content>
       </ion-infinite-scroll>
     </ion-content>
+
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button @click="presentQuickActionsSheet()">
+        <ion-icon :ios="addOutline" :md="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
   </ion-page>
 </template>
 
@@ -116,12 +121,17 @@ import {
   IonItemOptions,
   IonItemOption,
   IonItemSliding,
+  IonFab,
+  IonFabButton,
+  IonIcon,
   modalController,
+  actionSheetController,
 } from "@ionic/vue";
 import { Month, Day, Entry, EntryType, Duration } from "../types";
 import TimeService from "@/servies/times.service";
 import { defineComponent } from "vue";
 import TimeAddAndEditModalVue from "./TimeAddAndEditModal.vue";
+import { add, addOutline, close } from "ionicons/icons";
 
 function daysInMonth(month: number, year: number): number {
   return new Date(year, month, 0).getDate();
@@ -184,12 +194,12 @@ function setupMockData() {
 
 function isSameDate(first: Date, second: Date) {
   return (
-    first.toLocaleTimeString(navigator.language, {
+    first.toLocaleDateString(navigator.language, {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
     }) ===
-    second.toLocaleTimeString(navigator.language, {
+    second.toLocaleDateString(navigator.language, {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -223,6 +233,9 @@ export default defineComponent({
     IonItemOptions,
     IonItemOption,
     IonItemSliding,
+    IonFab,
+    IonFabButton,
+    IonIcon,
   },
   data() {
     return {
@@ -232,6 +245,8 @@ export default defineComponent({
       completeOvertime: "",
       interval: 1000,
       monthModifier: 0,
+      add,
+      addOutline,
     };
   },
   created() {
@@ -243,7 +258,9 @@ export default defineComponent({
   },
   methods: {
     loadCompleteOvertime() {
-      this.completeOvertime = this.formatDuration(TimeService.calculateOvertimeComplete());
+      this.completeOvertime = this.formatDuration(
+        TimeService.calculateOvertimeComplete()
+      );
     },
     getDayEntry(day: Day): Entry | undefined {
       if (day.entry) {
@@ -347,6 +364,7 @@ export default defineComponent({
           navigator.language,
           onlyMonthNameOptions
         ),
+        monthNumber: month,
         year: baseDate.getFullYear(),
         days: [],
       };
@@ -383,11 +401,12 @@ export default defineComponent({
             addEditModal.dismiss();
           },
           saveDayEntry: (entry: Entry) => {
-            if(day.entry){
-            day.entry.overtime = entry.overtime;}
+            if (day.entry) {
+              day.entry.overtime = entry.overtime;
+            }
             day.entry = entry;
-            
-            this.getTodayEntry();
+
+            this.loadStatistics();
           },
         },
       });
@@ -410,6 +429,57 @@ export default defineComponent({
         return dateEntry.overtime;
       }
       return undefined;
+    },
+    async presentQuickActionsSheet() {
+      const today = new Date();
+      let todayDayElement: Day | undefined = this.months
+        .filter(
+          (month) =>
+            month.year == today.getFullYear() &&
+            month.monthNumber == today.getMonth()
+        )
+        .flatMap((month) => month.days)
+        .find((day) => isSameDate(day.date, today));
+
+      if (!todayDayElement) {
+        todayDayElement = this.getDayForDate(today);
+      }
+
+      const quickActionsSheet = await actionSheetController.create({
+        header: "Quick actions",
+        buttons: [
+          {
+            text: "Come",
+            icon: add,
+            handler: () => {
+              todayDayElement!.entry = {
+                start: new Date(),
+                fullDay: false,
+                type: EntryType.WORK,
+              };
+
+              TimeService.saveEntryForDate(new Date(), todayDayElement!.entry);
+              this.loadStatistics();
+            },
+          },
+          {
+            text: "Create new entry",
+            icon: add,
+            handler: () => {
+              this.openAddEditModal(todayDayElement!);
+            },
+          },
+          {
+            text: "Cancel",
+            icon: close,
+            role: "cancel",
+            handler: () => {
+              console.log("Cancel clicked");
+            },
+          },
+        ],
+      });
+      await quickActionsSheet.present();
     },
   },
 });

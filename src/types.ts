@@ -1,5 +1,8 @@
+import { min } from "moment";
+
 export interface Month {
     name: string;
+    monthNumber: number;
     year: number;
     days: Day[];
 }
@@ -31,14 +34,17 @@ export enum EntryType {
 export class Duration {
     hours: number;
     minutes: number;
+    isNegative: boolean;
 
-    constructor(hours: number, minutes: number) {
+
+    constructor(hours: number, minutes: number, isNegative?: boolean) {
         this.hours = hours;
         this.minutes = minutes;
+        this.isNegative = isNegative == undefined ? hours < 0 || minutes < 0 : isNegative;
     }
 
     public toString(): string {
-        return this.hours + ":" + ((this.minutes < 10 && this.minutes >= 0) ? "0" : "") + (this.minutes < 0 ? this.minutes*-1 : this.minutes);
+        return (this.hours == 0 && this.isNegative ? "-" : "") + this.hours + ":" + ((this.minutes < 10 && this.minutes >= 0) ? "0" : "") + (this.minutes < 0 ? this.minutes * -1 : this.minutes);
     }
 
 }

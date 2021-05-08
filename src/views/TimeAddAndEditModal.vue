@@ -60,7 +60,7 @@
       </ion-item>
       <ion-item v-if="entry.type === EntryType.OVERTIME && !entry.fullDay">
         <ion-label>Overtime amount</ion-label>
-        
+
         <ion-datetime
           display-format="HH:mm"
           picker-format="HH:mm"
@@ -328,7 +328,8 @@ export default defineComponent({
         this.overtimeMode == OvertimeMode.REMOVE
           ? proxyDateForOvertime.getHours() * -1
           : proxyDateForOvertime.getHours(),
-        proxyDateForOvertime.getMinutes()
+        proxyDateForOvertime.getMinutes(),
+         this.overtimeMode == OvertimeMode.REMOVE
       );
     },
     updateOvertimeForFullDay() {
