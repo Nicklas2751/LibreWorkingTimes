@@ -137,6 +137,9 @@ const TimeService = {
 
         let newOldestDate: Date | null = null;
         if (newestDate != null) {
+            const startDate = new Date(oldestDateBefore);
+            startDate.setDate(startDate.getDate() + 1);
+            
             for (let date = new Date(oldestDateBefore); newOldestDate == null && date < newestDate; date.setDate(date.getDate() + 1)) {
                 const entry: Entry | null = this.loadEntryForDate(date);
                 if (entry != null) {
@@ -157,7 +160,10 @@ const TimeService = {
 
         let newNewestDate: Date | null = null;
         if (oldestDate != null) {
-            for (let date = new Date(newestDateBefore); newNewestDate == null && date > oldestDate; date.setDate(date.getDate() - 1)) {
+            const startDate = new Date(newestDateBefore);
+            startDate.setDate(startDate.getDate() - 1);
+
+            for (let date = startDate; newNewestDate == null && date > oldestDate; date.setDate(date.getDate() - 1)) {
                 const entry: Entry | null = this.loadEntryForDate(date);
                 if (entry != null) {
                     newNewestDate = new Date(date);

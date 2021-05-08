@@ -78,7 +78,7 @@ describe('times.service.ts', () => {
                 start: currentDateTime,
                 end: currentDateThirtyMinutesLater,
                 type: EntryType.WORK,
-                pausetime: new Duration(0,15),
+                pausetime: new Duration(0, 15),
             };
 
 
@@ -437,19 +437,375 @@ describe('times.service.ts', () => {
             //GIVEN
 
             //WHEN
-            const perfectEnd: Date = TimeService.calculatePerfectEnd(new Date(2021,0,1,10,0),new Duration(0,15));
+            const perfectEnd: Date = TimeService.calculatePerfectEnd(new Date(2021, 0, 1, 10, 0), new Duration(0, 15));
 
             //THEN
-            expect(perfectEnd).toMatchObject<Date>(new Date(2021,0,1,18,15));
+            expect(perfectEnd).toMatchObject<Date>(new Date(2021, 0, 1, 18, 15));
         }),
         it('calculate perfect end end on next day', () => {
 
             //GIVEN
 
             //WHEN
-            const perfectEnd: Date = TimeService.calculatePerfectEnd(new Date(2021,0,1,23,0),new Duration(0,45));
+            const perfectEnd: Date = TimeService.calculatePerfectEnd(new Date(2021, 0, 1, 23, 0), new Duration(0, 45));
 
             //THEN
-            expect(perfectEnd).toMatchObject<Date>(new Date(2021,0,2,7,45));
+            expect(perfectEnd).toMatchObject<Date>(new Date(2021, 0, 2, 7, 45));
+        }),
+
+        it('delete entry for existing date', () => {
+
+            //GIVEN
+            localStorage.clear();
+            const entryKey = times.STORAGE_KEY_ENTRY + "01/01/2021"
+            localStorage.setItem(entryKey, JSON.stringify({
+                type: EntryType.WORK,
+                start: new Date(2021, 0, 1, 10, 0),
+                end: new Date(2021, 0, 1, 19, 0),
+                pausetime: new Duration(1, 0),
+            } as Entry));
+
+            //WHEN
+            TimeService.deleteEntryForDate(new Date(2021, 0, 1));
+
+            //THEN
+            expect(localStorage.getItem(entryKey)).toBeNull();
+        }),
+        it('delete entry for not existing date', () => {
+
+            //GIVEN
+            localStorage.clear();
+            const entryKey = times.STORAGE_KEY_ENTRY + "01/01/2021"
+            localStorage.setItem(entryKey, JSON.stringify({
+                type: EntryType.WORK,
+                start: new Date(2021, 0, 1, 10, 0),
+                end: new Date(2021, 0, 1, 19, 0),
+                pausetime: new Duration(1, 0),
+            } as Entry));
+
+            //WHEN
+            TimeService.deleteEntryForDate(new Date(2021, 0, 2));
+
+            //THEN
+            expect(localStorage.getItem(entryKey)).not.toBeNull();
+        }),
+
+        it('find new newest entry more entries exist', () => {
+
+            //GIVEN
+            localStorage.clear();
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/01/2021", JSON.stringify({
+                type: EntryType.WORK,
+                start: new Date(2021, 0, 1, 10, 0),
+                end: new Date(2021, 0, 1, 19, 0)
+            } as Entry));
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/02/2021", JSON.stringify({
+                type: EntryType.OVERTIME,
+                start: new Date(2021, 0, 2, 0, 0),
+                overtime: new Duration(-8, 0, true),
+            } as Entry));
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/03/2021", JSON.stringify({
+                type: EntryType.OVERTIME,
+                start: new Date(2021, 0, 3, 0, 0),
+                overtime: new Duration(0, 30),
+            } as Entry));
+            const currentNewestDate = new Date(2021, 0, 3)
+            localStorage.setItem(times.STORAGE_KEY_NEWEST_DATE, JSON.stringify(currentNewestDate));
+            localStorage.setItem(times.STORAGE_KEY_OLDEST_DATE, JSON.stringify(new Date(2021, 0, 1)));
+
+            //WHEN
+            TimeService.findNewNewestDate(currentNewestDate);
+
+            //THEN
+            expect(localStorage.getItem(times.STORAGE_KEY_NEWEST_DATE)).toMatch(JSON.stringify(new Date(2021, 0, 2)));
+        }),
+        it('find new newest entry no more entries exist', () => {
+
+            //GIVEN
+            localStorage.clear();
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/01/2021", JSON.stringify({
+                type: EntryType.WORK,
+                start: new Date(2021, 0, 1, 10, 0),
+                end: new Date(2021, 0, 1, 19, 0)
+            } as Entry));
+            const currentNewestDate = new Date(2021, 0, 1)
+            localStorage.setItem(times.STORAGE_KEY_NEWEST_DATE, JSON.stringify(currentNewestDate));
+            localStorage.setItem(times.STORAGE_KEY_OLDEST_DATE, JSON.stringify(new Date(2021, 0, 1)));
+
+            //WHEN
+            TimeService.findNewNewestDate(currentNewestDate);
+
+            //THEN
+            expect(localStorage.getItem(times.STORAGE_KEY_NEWEST_DATE)).toBeNull();
+        }),
+
+        it('find new oldest entry more entries exist', () => {
+
+            //GIVEN
+            localStorage.clear();
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/02/2021", JSON.stringify({
+                type: EntryType.OVERTIME,
+                start: new Date(2021, 0, 2, 0, 0),
+                overtime: new Duration(-8, 0, true),
+            } as Entry));
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/03/2021", JSON.stringify({
+                type: EntryType.OVERTIME,
+                start: new Date(2021, 0, 3, 0, 0),
+                overtime: new Duration(0, 30),
+            } as Entry));
+            const currentOldestDate = new Date(2021, 0, 1)
+            localStorage.setItem(times.STORAGE_KEY_NEWEST_DATE, JSON.stringify(new Date(2021, 0, 3)));
+            localStorage.setItem(times.STORAGE_KEY_OLDEST_DATE, JSON.stringify(currentOldestDate));
+
+            //WHEN
+            TimeService.findNewOldestDate(currentOldestDate);
+
+            //THEN
+            expect(localStorage.getItem(times.STORAGE_KEY_OLDEST_DATE)).toMatch(JSON.stringify(new Date(2021, 0, 2)));
+        }),
+        it('find new oldest entry no more entries exist', () => {
+
+            //GIVEN
+            localStorage.clear();
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/01/2021", JSON.stringify({
+                type: EntryType.WORK,
+                start: new Date(2021, 0, 1, 10, 0),
+                end: new Date(2021, 0, 1, 19, 0)
+            } as Entry));
+            const currentOldestDate = new Date(2021, 0, 3)
+            localStorage.setItem(times.STORAGE_KEY_NEWEST_DATE, JSON.stringify(new Date(2021, 0, 3)));
+            localStorage.setItem(times.STORAGE_KEY_OLDEST_DATE, JSON.stringify(currentOldestDate));
+
+            //WHEN
+            TimeService.findNewOldestDate(currentOldestDate);
+
+            //THEN
+            expect(localStorage.getItem(times.STORAGE_KEY_OLDEST_DATE)).toBeNull();
+        }),
+
+        it('load existing entry for date', () => {
+
+            //GIVEN
+            localStorage.clear();
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/01/2021", JSON.stringify({
+                type: EntryType.WORK,
+                start: new Date(2021, 0, 1, 10, 0),
+                end: new Date(2021, 0, 1, 19, 0)
+            } as Entry));
+
+            //WHEN
+            const loadedEntry: Entry | null = TimeService.loadEntryForDate(new Date(2021, 0, 1));
+
+            //THEN
+            expect(loadedEntry).not.toBeNull();
+        }),
+        it('load entry for date not existing', () => {
+
+            //GIVEN
+            localStorage.clear();
+
+            //WHEN
+            const loadedEntry: Entry | null = TimeService.loadEntryForDate(new Date(2021, 0, 1));
+
+            //THEN
+            expect(loadedEntry).toBeNull();
+        }),
+        it('load entry for date wrong date', () => {
+
+            //GIVEN
+            localStorage.clear();
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/01/2021", JSON.stringify({
+                type: EntryType.WORK,
+                start: new Date(2021, 0, 1, 10, 0),
+                end: new Date(2021, 0, 1, 19, 0)
+            } as Entry));
+
+            //WHEN
+            const loadedEntry: Entry | null = TimeService.loadEntryForDate(new Date(2021, 0, 2));
+
+            //THEN
+            expect(loadedEntry).toBeNull();
+        }),
+
+        it('load entry from valid json', () => {
+
+            //GIVEN
+            const entry: Entry = {
+                fullDay: false,
+                type: EntryType.WORK,
+                start: new Date(2021, 0, 1, 10, 0),
+                end: new Date(2021, 0, 1, 19, 0)
+            };
+            const entryJson: string = JSON.stringify(entry);
+
+            //WHEN
+            const loadedEntry: Entry | null = TimeService.loadEntryFromJson(entryJson);
+
+            //THEN
+            expect(loadedEntry).toMatchObject<Entry>(entry);
+        }),
+        it('load entry from json null', () => {
+
+            //GIVEN
+
+            //WHEN
+            const loadedEntry: Entry | null = TimeService.loadEntryFromJson(null);
+
+            //THEN
+            expect(loadedEntry).toBeNull();
+        }),
+
+        it('load oldest date', () => {
+
+            //GIVEN
+            localStorage.clear();
+            localStorage.setItem(times.STORAGE_KEY_OLDEST_DATE, JSON.stringify(new Date(2021, 0, 3)));
+
+            //WHEN
+            const oldestDate: Date | null = TimeService.loadOldestDate();
+
+            //THEN
+            expect(oldestDate).toMatchObject<Date>(new Date(2021, 0, 3));
+        }),
+        it('load oldest date not exist', () => {
+
+            //GIVEN
+            localStorage.clear();
+
+            //WHEN
+            const oldestDate: Date | null = TimeService.loadOldestDate();
+
+            //THEN
+            expect(oldestDate).toBeNull();
+        }),
+
+        it('load newest date', () => {
+
+            //GIVEN
+            localStorage.clear();
+            localStorage.setItem(times.STORAGE_KEY_NEWEST_DATE, JSON.stringify(new Date(2021, 0, 1)));
+
+            //WHEN
+            const newestDate: Date | null = TimeService.loadNewestDate();
+
+            //THEN
+            expect(newestDate).toMatchObject<Date>(new Date(2021, 0, 1));
+        }),
+        it('load newest date not exist', () => {
+
+            //GIVEN
+            localStorage.clear();
+
+            //WHEN
+            const newestDate: Date | null = TimeService.loadNewestDate();
+
+            //THEN
+            expect(newestDate).toBeNull();
+        }),
+
+        it('save entry for date', () => {
+
+            //GIVEN
+            localStorage.clear();
+            const entry: Entry = {
+                type: EntryType.WORK,
+                start: new Date(2021, 0, 1, 10, 0),
+                end: new Date(2021, 0, 1, 19, 0),
+                fullDay: false
+            };
+
+            //WHEN
+            TimeService.saveEntryForDate(new Date(2021,0,1),entry);
+            
+            //THEN
+            expect(localStorage.getItem(times.STORAGE_KEY_ENTRY + "01/01/2021")).toMatch(JSON.stringify(entry));
+        }),
+        it('save entry for divergent date', () => {
+
+            //GIVEN
+            localStorage.clear();
+            const entry: Entry = {
+                type: EntryType.WORK,
+                start: new Date(2021, 0, 1, 10, 0),
+                end: new Date(2021, 0, 1, 19, 0),
+                fullDay: false
+            };
+
+            //WHEN
+            TimeService.saveEntryForDate(new Date(2021,0,15),entry);
+            
+            //THEN
+            expect(localStorage.getItem(times.STORAGE_KEY_ENTRY + "01/15/2021")).toMatch(JSON.stringify(entry));
+        }),
+
+        it('save entry for date update newest date', () => {
+
+            //GIVEN
+            localStorage.clear();
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/01/2021", JSON.stringify({
+                type: EntryType.WORK,
+                start: new Date(2021, 0, 1, 10, 0),
+                end: new Date(2021, 0, 1, 19, 0)
+            } as Entry));
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/02/2021", JSON.stringify({
+                type: EntryType.OVERTIME,
+                start: new Date(2021, 0, 2, 0, 0),
+                overtime: new Duration(-8, 0, true),
+            } as Entry));
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/03/2021", JSON.stringify({
+                type: EntryType.OVERTIME,
+                start: new Date(2021, 0, 3, 0, 0),
+                overtime: new Duration(0, 30),
+            } as Entry));
+            localStorage.setItem(times.STORAGE_KEY_NEWEST_DATE, JSON.stringify(new Date(2021, 0, 3)));
+            localStorage.setItem(times.STORAGE_KEY_OLDEST_DATE, JSON.stringify(new Date(2021, 0, 1)));
+
+            const entry: Entry = {
+                type: EntryType.VACATION,
+                start: new Date(2021, 0, 15, 0, 0),
+                fullDay: true
+            };
+
+            //WHEN
+            TimeService.saveEntryForDate(new Date(2021,0,15),entry);
+            
+            //THEN
+            expect(localStorage.getItem(times.STORAGE_KEY_NEWEST_DATE)).toMatch(JSON.stringify(new Date(2021,0,15)));
+        }),
+        it('save entry for date update oldest date', () => {
+
+            //GIVEN
+            localStorage.clear();
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/01/2021", JSON.stringify({
+                type: EntryType.WORK,
+                start: new Date(2021, 0, 1, 10, 0),
+                end: new Date(2021, 0, 1, 19, 0)
+            } as Entry));
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/02/2021", JSON.stringify({
+                type: EntryType.OVERTIME,
+                start: new Date(2021, 0, 2, 0, 0),
+                overtime: new Duration(-8, 0, true),
+            } as Entry));
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/03/2021", JSON.stringify({
+                type: EntryType.OVERTIME,
+                start: new Date(2021, 0, 3, 0, 0),
+                overtime: new Duration(0, 30),
+            } as Entry));
+            localStorage.setItem(times.STORAGE_KEY_NEWEST_DATE, JSON.stringify(new Date(2021, 0, 3)));
+            localStorage.setItem(times.STORAGE_KEY_OLDEST_DATE, JSON.stringify(new Date(2021, 0, 1)));
+
+            const entry: Entry = {
+                type: EntryType.VACATION,
+                start: new Date(2020, 0, 15, 0, 0),
+                fullDay: true
+            };
+
+            //WHEN
+            TimeService.saveEntryForDate(new Date(2020,0,15),entry);
+            
+            //THEN
+            expect(localStorage.getItem(times.STORAGE_KEY_OLDEST_DATE)).toMatch(JSON.stringify(new Date(2020,0,15)));
         })
+        
+
 })
