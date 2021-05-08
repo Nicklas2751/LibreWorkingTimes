@@ -78,7 +78,8 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           install: false
-          command: npm run test:e2e
+          record: true
+          #command: npm run test:e2e
       - uses: actions/upload-artifact@v1
         if: failure()
         with:
