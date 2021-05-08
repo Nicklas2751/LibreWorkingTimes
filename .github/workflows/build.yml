@@ -73,5 +73,5 @@ jobs:
         with:
           path: node_modules
           key: ubuntu-latest-node-v15.x-deps-${{ hashFiles(format('{0}{1}', github.workspace, '/package-lock.json')) }}
-      - run: cypress install
+      - run: npx cypress install
       - run: npm run test:e2e
