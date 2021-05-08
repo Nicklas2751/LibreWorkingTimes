@@ -3,9 +3,9 @@ import { Entry, EntryType, Duration } from "../types";
 import moment from "moment";
 import SettingsService from "./settings.service";
 
-const STORAGE_KEY_ENTRY = "WorkTimeEntry";
-const STORAGE_KEY_NEWEST_DATE = "NewestTimesEntryDate";
-const STORAGE_KEY_OLDEST_DATE = "OldestTimesEntryDate";
+export const STORAGE_KEY_ENTRY = "WorkTimeEntry";
+export const STORAGE_KEY_NEWEST_DATE = "NewestTimesEntryDate";
+export const STORAGE_KEY_OLDEST_DATE = "OldestTimesEntryDate";
 
 function calcDurationFromMinutes(completeMinutes: number): Duration {
 
@@ -193,11 +193,11 @@ const TimeService = {
         if (updatedEntry.type === EntryType.WORK) {
             let worktimeDuration: moment.Duration;
 
-            if (updatedEntry.start < updatedEntry.end) {
+            //if (updatedEntry.start < updatedEntry.end) {
                 worktimeDuration = moment.duration(moment(updatedEntry.end).diff(moment(updatedEntry.start)));
-            } else {
+            /*} else {
                 worktimeDuration = moment.duration(moment(updatedEntry.start).diff(moment(updatedEntry.end)));
-            }
+            }*/
 
             worktimeDuration = calculateOvertime(worktimeDuration, dailyPausetime);
 
