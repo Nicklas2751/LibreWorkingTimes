@@ -1,5 +1,3 @@
-import { min } from "moment";
-
 export interface Month {
     name: string;
     monthNumber: number;
