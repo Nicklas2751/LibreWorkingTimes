@@ -498,9 +498,6 @@ export default defineComponent({
             text: "Cancel",
             icon: close,
             role: "cancel",
-            handler: () => {
-              console.log("Cancel clicked");
-            },
           },
         ],
       });

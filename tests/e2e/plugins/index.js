@@ -6,9 +6,10 @@
 // as explained in the cypress docs
 // https://docs.cypress.io/api/plugins/preprocessors-api.html#Examples
 
- import webpack from 'cypress-webpack-preprocessor-v5'
+/* eslint @typescript-eslint/no-var-requires: "off" */
+ const webpack = require('cypress-webpack-preprocessor-v5')
 
-export default (on, config) => {
+module.exports = (on, config) => {
    on('file:preprocessor', webpack({
     webpackOptions: require('@vue/cli-service/webpack.config'),
     watchOptions: {}
