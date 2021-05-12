@@ -7,15 +7,15 @@
         </ion-buttons>
         <ion-grid>
           <ion-row>
-            <ion-col class="ion-align-self-center" size="6">
+            <ion-col id="complete-overtime" class="ion-align-self-center" size="6">
               <span class="bold">Überstunden:</span> {{ completeOvertime }}
             </ion-col>
             <ion-col class="ion-align-self-center" size="3">
               <span class="bold">Heute:</span>
             </ion-col>
-            <ion-col class="ion-align-self-center" size="3">
+            <ion-col id="today-stats" class="ion-align-self-center" size="3">
               {{ formatDuration(current.worktime) }}<br />
-              <ion-text :color="switchOvertimeColor(current.overtime)">{{
+              <ion-text id="today-overtime" :color="switchOvertimeColor(current.overtime)">{{
                 formatDuration(current.overtime)
               }}</ion-text>
             </ion-col>
@@ -25,38 +25,39 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <ion-list ref="entryList">
+      <ion-list id="times-list" ref="entryList">
         <ion-item-group v-bind:key="month.name" v-for="month in months">
-          <ion-item-divider color="primary" sticky
+          <ion-item-divider id="times-divider-{{month.name}}-{{month.year}}" color="primary" sticky
             >{{ month.name }} {{ month.year }}</ion-item-divider
           >
           <ion-item-sliding v-for="day in month.days" v-bind:key="day.day">
-            <ion-item @click="openAddEditModal(day)">
+            <ion-item id="times-item-{{day.day}}-{{month.name}}-{{month.year}}" @click="openAddEditModal(day)">
               <ion-grid>
                 <ion-row>
                   <ion-col size="4">
                     <ion-label :color="switchLabelColor(day)">
-                      <div>{{ day.weekday }}.</div>
-                      <div class="bigger">
+                      <div id="times-item-day-weekday">{{ day.weekday }}.</div>
+                      <div id="times-item-day-day" class="bigger">
                         {{ day.day }}
                       </div>
                     </ion-label>
                   </ion-col>
 
                   <ion-col size="4" v-if="getDayEntry(day)">
-                    <ion-text v-if="isWork(getDayEntry(day).type)">
+                    <ion-text id="times-item-start-end-time" v-if="isWork(getDayEntry(day).type)">
                       {{ formatTime(getDayEntry(day).start) }} -
                       {{ formatTime(getDayEntry(day).end) }}
                     </ion-text>
                   </ion-col>
 
                   <ion-col
+                    id="times-item-stats"
                     size="4"
                     class="ion-text-end"
                     v-if="getDayEntry(day)"
                   >
                     {{ formatDuration(getDayEntry(day).worktime) }}<br />
-                    <ion-text
+                    <ion-text id="times-item-overtime"
                       :color="switchOvertimeColor(getDayEntry(day).overtime)"
                       >{{ getDayEntry(day).overtime.toString() }}</ion-text
                     >
@@ -66,6 +67,7 @@
             </ion-item>
             <ion-item-options side="end">
               <ion-item-option
+                id="times-item-delete-button"
                 v-if="day.entry"
                 ion-item-option
                 color="danger"
@@ -92,7 +94,7 @@
     </ion-content>
 
     <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-      <ion-fab-button @click="presentQuickActionsSheet()">
+      <ion-fab-button id="times-quick-add-button" @click="presentQuickActionsSheet()">
         <ion-icon :ios="addOutline" :md="add"></ion-icon>
       </ion-fab-button>
     </ion-fab>
@@ -272,10 +274,10 @@ export default defineComponent({
       return;
     },
     loadStatistics() {
-      this.getTodayEntry();
+      this.loadTodayEntry();
       this.loadCompleteOvertime();
     },
-    getTodayEntry() {
+    loadTodayEntry() {
       const current = TimeService.loadEntryForDate(new Date());
       if (current == null) {
         this.current = {
