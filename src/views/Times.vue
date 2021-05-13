@@ -34,14 +34,14 @@
       <ion-list id="times-list" ref="entryList">
         <ion-item-group v-bind:key="month.name" v-for="month in months">
           <ion-item-divider
-            id="times-divider-{{month.name}}-{{month.year}}"
+            :id="'times-divider-'+month.name.toLowerCase()+'-'+month.year"
             color="primary"
             sticky
             >{{ month.name }} {{ month.year }}</ion-item-divider
           >
           <ion-item-sliding v-for="day in month.days" v-bind:key="day.day">
             <ion-item
-              id="times-item-{{day.day}}-{{month.name}}-{{month.year}}"
+              :id="'times-item-'+day.day+'-'+month.name.toLowerCase()+'-'+month.year"
               @click="openAddEditModal(day)"
             >
               <ion-grid>

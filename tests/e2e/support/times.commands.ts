@@ -22,4 +22,10 @@
 //
 //
 // -- This is will overwrite an existing command --
+
+//import { Entry } from "@/types";
+
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+/*Cypress.Commands.add("createEntry",(entry: Entry) => {
+
+})*/
