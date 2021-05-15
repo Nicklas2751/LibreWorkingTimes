@@ -2,13 +2,13 @@
   <ion-header>
     <ion-toolbar>
       <ion-buttons slot="start">
-        <ion-button @click="dismiss()"> Abort </ion-button>
+        <ion-button id="times-new-entry-abort" @click="dismiss()"> Abort </ion-button>
       </ion-buttons>
 
       <ion-title>{{ title }}</ion-title>
 
       <ion-buttons slot="end">
-        <ion-button @click="save()"> Save </ion-button>
+        <ion-button id="times-new-entry-save" @click="save()"> Save </ion-button>
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
@@ -16,15 +16,15 @@
     <ion-list>
       <ion-item>
         <ion-label>Type</ion-label>
-        <ion-select v-model="entry.type">
-          <ion-select-option :value="EntryType.WORK">Work</ion-select-option>
-          <ion-select-option :value="EntryType.OVERTIME"
+        <ion-select id="times-new-entry-type-select" v-model="entry.type">
+          <ion-select-option id="times-new-entry-type-select-option-work" :value="EntryType.WORK">Work</ion-select-option>
+          <ion-select-option  id="times-new-entry-type-select-option-overtime" :value="EntryType.OVERTIME"
             >Overtime</ion-select-option
           >
-          <ion-select-option :value="EntryType.VACATION"
+          <ion-select-option id="times-new-entry-type-select-option-vacation" :value="EntryType.VACATION"
             >Vacation</ion-select-option
           >
-          <ion-select-option :value="EntryType.ILL">Illness</ion-select-option>
+          <ion-select-option id="times-new-entry-type-select-option-illness" :value="EntryType.ILL">Illness</ion-select-option>
         </ion-select>
       </ion-item>
 

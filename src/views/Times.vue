@@ -212,6 +212,19 @@ function setupMockData() {
     TimeService.saveEntryForDate(entry.start, TimeService.calculateEntry(entry))
   );
 }
+function createItemSelectorTextForDate(date: Date): string {
+  const day = date.toLocaleDateString(navigator.language, {
+    day: "2-digit"
+  }).toLowerCase();
+  const month = date.toLocaleDateString(navigator.language, {
+    month: "long"
+  }).toLowerCase();
+  const year = date.toLocaleDateString(navigator.language, {
+    year: "numeric"
+  }).toLowerCase();
+
+  return day+"-"+month+"-"+year;
+}
 
 function isSameDate(first: Date, second: Date) {
   return (
@@ -415,6 +428,7 @@ export default defineComponent({
     },
     async openAddEditModal(day: Day) {
       const addEditModal = await modalController.create({
+        id: "times-new-entry-"+createItemSelectorTextForDate(day.date),
         component: TimeAddAndEditModalVue,
         componentProps: {
           day: day,
