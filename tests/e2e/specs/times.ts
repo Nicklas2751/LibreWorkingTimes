@@ -46,7 +46,7 @@ describe("Times overview", () => {
     cy.get("#times-new-entry-"+todayDayString+" #times-new-entry-abort").click();
   }),
 
-  it("Add ill enty with dialog for yesterday", () => {
+  it("Add ill entry with dialog for yesterday", () => {
     //GIVEN
     const today = new Date();
     const yesterday = new Date(today);
@@ -69,7 +69,7 @@ describe("Times overview", () => {
     cy.get("#times-item-"+yesterdayDayString+" #times-item-stats").should("have.text","8:000:00");
   }),
 
-  it("Add work enty with dialog for today", () => {
+  it("Add work entry with dialog for today", () => {
     //GIVEN
     const today = new Date();
     const todayDayString: string = createItemSelectorTextForDate(today);
@@ -81,6 +81,52 @@ describe("Times overview", () => {
     //THEN
     cy.get("#times-item-"+todayDayString+" #times-item-stats").should("have.text","8:000:00")
     cy.get("#today-stats").should("have.text","8:000:00")
+  }),
+
+  it("Add vacation entry with dialog", () => {
+    //GIVEN
+    const today = new Date();
+    const day = new Date(today);
+    day.setDate(today.getDate()-2);
+    const dayString: string = createItemSelectorTextForDate(day);
+    cy.get("#times-item-"+dayString).click({force: true});
+
+    //WHEN
+    //Open type dialog
+    cy.get("#times-new-entry-"+dayString+" #times-new-entry-type-select").click({force: true});
+    //Check type
+    cy.get("#alert-input-6-2").click();
+    //Set type
+    cy.get(".alert-button-group > :nth-child(2) > .alert-button-inner").click();
+    
+    //Save
+    cy.get("#times-new-entry-"+dayString+" #times-new-entry-save").click();
+
+    //THEN
+    cy.get("#times-item-"+dayString+" #times-item-stats").should("have.text","0:000:00");
+  }),
+
+  it("Add overtime default entry with dialog", () => {
+    //GIVEN
+    const today = new Date();
+    const day = new Date(today);
+    day.setDate(today.getDate()-3);
+    const dayString: string = createItemSelectorTextForDate(day);
+    cy.get("#times-item-"+dayString).click({force: true});
+
+    //WHEN
+    //Open type dialog
+    cy.get("#times-new-entry-"+dayString+" #times-new-entry-type-select").click({force: true});
+    //Check type
+    cy.get("#alert-input-8-1").click();
+    //Set type
+    cy.get(".alert-button-group > :nth-child(2) > .alert-button-inner").click();
+    
+    //Save
+    cy.get("#times-new-entry-"+dayString+" #times-new-entry-save").click();
+
+    //THEN
+    cy.get("#times-item-"+dayString+" #times-item-stats").should("have.text","0:00-8:00");
   })
   
 })
