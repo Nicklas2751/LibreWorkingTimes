@@ -327,6 +327,30 @@ describe('times.service.ts', () => {
             //THEN
             expect(overtimeComplete).toMatchObject<Duration>(new Duration(8, 0));
         }),
+        it('calculate overtime two overtime entries positive sum', () => {
+
+            //GIVEN
+            localStorage.clear();
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/02/2021", JSON.stringify({
+                type: EntryType.OVERTIME,
+                start: new Date(2021, 0, 2, 4, 3, 2, 1),
+                overtime: new Duration(2, 0),
+            } as Entry));
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/03/2021", JSON.stringify({
+                type: EntryType.OVERTIME,
+                start: new Date(2021, 0, 3, 1, 2, 3, 4),
+                overtime: new Duration(-8, 0, true),
+            } as Entry));
+            localStorage.setItem(times.STORAGE_KEY_NEWEST_DATE, JSON.stringify(new Date(2021, 0, 3, 1, 2, 3, 4)));
+            localStorage.setItem(times.STORAGE_KEY_OLDEST_DATE, JSON.stringify(new Date(2021, 0, 2, 4, 3, 2, 1)));
+
+
+            //WHEN
+            const overtimeComplete: Duration = TimeService.calculateOvertimeComplete();
+
+            //THEN
+            expect(overtimeComplete).toMatchObject<Duration>(new Duration(-6, 0, true));
+        }),
         it('calculate overtime complete three entries negative sum', () => {
 
             //GIVEN

@@ -32,6 +32,7 @@
       <ion-item v-if="entry.type === EntryType.WORK">
         <ion-label>Start Time</ion-label>
         <ion-datetime
+          id="times-new-entry-work-start"
           display-format="DD.MM.YYYY HH:mm"
           picker-format="DD.MM.YYYY HH:mm"
           :value="entry.start.toString()"
@@ -41,6 +42,7 @@
       <ion-item v-if="entry.type === EntryType.WORK">
         <ion-label>End Time</ion-label>
         <ion-datetime
+          id="times-new-entry-work-end"
           display-format="DD.MM.YYYY HH:mm"
           picker-format="DD.MM.YYYY HH:mm"
           :value="entry.end.toString()"
@@ -52,6 +54,7 @@
       <ion-item v-if="entry.type === EntryType.OVERTIME">
         <ion-label>Day</ion-label>
         <ion-datetime
+          id="times-new-entry-overtime-day"
           display-format="DD.MM.YYYY"
           picker-format="DD.MM.YYYY"
           :value="entry.start.toString()"
@@ -62,6 +65,7 @@
         <ion-label>Overtime amount</ion-label>
 
         <ion-datetime
+          id="times-new-entry-overtime-amount"
           display-format="HH:mm"
           picker-format="HH:mm"
           :value="getOvertimeForPicker()"
@@ -276,6 +280,17 @@ export default defineComponent({
       //Set overtime for vacation to 0
       if (this.entry.type == EntryType.VACATION) {
         this.entry.overtime = new Duration(0, 0);
+      }
+
+      //If not type work set start and end time to 0:00
+      if(this.entry.type != EntryType.WORK)
+      {
+        this.entry.start.setHours(0,0,0,0);
+
+        if(this.entry.end)
+        {
+          this.entry.end.setHours(0,0,0,0);
+        }
       }
 
       //Save to local storage

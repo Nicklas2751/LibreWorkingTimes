@@ -58,10 +58,14 @@ function isSameDate(first: Date, second: Date) {
 }
 
 function saveNewestDate(date: Date) {
+    //Clear time
+    date.setHours(0,0,0,0);
     localStorage.setItem(STORAGE_KEY_NEWEST_DATE, JSON.stringify(date));
 }
 
 function saveOldestDate(date: Date) {
+    //Clear time
+    date.setHours(0,0,0,0);
     localStorage.setItem(STORAGE_KEY_OLDEST_DATE, JSON.stringify(date));
 }
 
@@ -240,6 +244,10 @@ const TimeService = {
         return moment(start).add(totalDailyDuration).toDate();
     },
     calculateOvertimeForTimeRange(start: Date, end: Date): Duration {
+        //Clear time
+        start.setHours(0,0,0,0);
+        end.setHours(0,0,0,0);
+
         const overtime = moment.duration(0);
         for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
             const entry: Entry | null = this.loadEntryForDate(date);
@@ -255,6 +263,9 @@ const TimeService = {
         if (oldestDate == null || newestDate == null) {
             return new Duration(0, 0);
         }
+        //Clear time
+        oldestDate.setHours(0,0,0,0);
+        newestDate.setHours(0,0,0,0);
 
         return this.calculateOvertimeForTimeRange(oldestDate, newestDate);
     },
