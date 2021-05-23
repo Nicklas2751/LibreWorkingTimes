@@ -1,3 +1,5 @@
+import "cypress-localstorage-commands";
+
 function createItemSelectorTextForDate(date: Date): string {
   const day = date.toLocaleDateString(navigator.language, {
     day: "2-digit"
@@ -16,6 +18,13 @@ describe("Times overview", () => {
   before(() => {
     cy.visit("/times");
     cy.clearLocalStorage();
+    cy.clearLocalStorageSnapshot();
+  }),
+  beforeEach(() => {
+    cy.restoreLocalStorage();
+  }),
+  afterEach(() => {
+    cy.saveLocalStorage();
   }),
 
   it("Complete overtime zero", () => {
@@ -162,7 +171,7 @@ describe("Times overview", () => {
 
     //THEN
     cy.get("#times-item-"+dayString+" #times-item-stats").should("have.text","0:002:00");
-    cy.get("#complete-overtime").should("have.text","Überstunden: 6:00");
+    cy.get("#complete-overtime").should("have.text","Überstunden: -6:00");
   })
   //cy.get("#today-stats").should("have.text","8:000:00")
 })
