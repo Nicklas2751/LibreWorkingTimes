@@ -1,7 +1,5 @@
 {
   "name": "Arbeitszeiten",
-  "integrations": {
-    "capacitor": {}
-  },
+  "integrations": {},
   "type": "vue"
 }

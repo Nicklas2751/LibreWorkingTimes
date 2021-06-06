@@ -41,7 +41,7 @@
           >
           <ion-item-sliding v-for="day in month.days" v-bind:key="day.day">
             <ion-item
-              :id="'times-item-'+day.day+'-'+month.name.toLowerCase()+'-'+month.year"
+              :id="'times-item-'+(day.day < 10 ? '0' : '')+day.day+'-'+month.name.toLowerCase()+'-'+month.year"
               @click="openAddEditModal(day)"
             >
               <ion-grid>
