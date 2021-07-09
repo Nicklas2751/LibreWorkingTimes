@@ -269,6 +269,20 @@ const TimeService = {
 
         return this.calculateOvertimeForTimeRange(oldestDate, newestDate);
     },
+    calculateWorktimeForTimeRange(start: Date, end: Date): Duration {
+        //Clear time
+        start.setHours(0,0,0,0);
+        end.setHours(0,0,0,0);
+
+        const worktime = moment.duration(0);
+        for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+            const entry: Entry | null = this.loadEntryForDate(date);
+            if (entry != null && entry.worktime) {
+                worktime.add(entry.worktime);
+            }
+        }
+        return calcDurationFromMinutes(worktime.asMinutes());
+    },
 
 }
 

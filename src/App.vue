@@ -5,7 +5,7 @@
         <ion-content>
           <ion-list id="inbox-list">
             <ion-list-header>Arbeitszeiten</ion-list-header>
-            <ion-note>Nicklas @ MethodPark</ion-note>
+            <ion-note>Nicklas @ Work</ion-note>
   
             <ion-menu-toggle auto-hide="false" v-for="(p, i) in appPages" :key="i">
               <ion-item @click="selectedIndex = i" router-direction="root" :router-link="p.url" lines="none" detail="false" class="hydrated" :class="{ selected: selectedIndex === i }">
@@ -81,11 +81,6 @@ export default defineComponent({
         mdIcon: settings
       }
     ];
-    
-    const path = window.location.pathname.split('folder/')[1];
-    if (path !== undefined) {
-      selectedIndex.value = appPages.findIndex(page => page.title.toLowerCase() === path.toLowerCase());
-    }
     
     const route = useRoute();
     
