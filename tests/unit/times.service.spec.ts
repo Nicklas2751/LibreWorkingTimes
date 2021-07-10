@@ -910,7 +910,49 @@ describe('times.service.ts', () => {
 
             //THEN
             expect(worktimeComplete).toMatchObject<Duration>(new Duration(16, 30));
-        })
+        }),
+
+        it('calculate worktime over all time, all in range', () => {
+
+            //GIVEN
+            localStorage.clear();
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/01/2021", JSON.stringify({
+                type: EntryType.WORK,
+                start: new Date(2021, 0, 1, 10, 0),
+                end: new Date(2021, 0, 1, 19, 0)
+            } as Entry));
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "01/02/2021", JSON.stringify({
+                type: EntryType.ILL,
+                start: new Date(2021, 0, 2, 0, 0),
+                worktime: new Duration(8, 0),
+            } as Entry));
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/15/2021", JSON.stringify({
+                type: EntryType.WORK,
+                start: new Date(2021, 1, 15, 10, 0),
+                end: new Date(2021, 1, 15, 19, 0)
+            } as Entry));
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/16/2021", JSON.stringify({
+                type: EntryType.ILL,
+                start: new Date(2021, 1, 16, 10, 0),
+                worktime: new Duration(8, 0),
+            } as Entry));
+
+            //In range but for overtime the worktime is 0
+            localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/17/2021", JSON.stringify({
+                type: EntryType.OVERTIME,
+                start: new Date(2021, 1, 17, 0, 0),
+                overtime: new Duration(7, 30),
+            } as Entry));
+
+            localStorage.setItem(times.STORAGE_KEY_OLDEST_DATE, JSON.stringify(new Date(2021, 0, 1)));
+            localStorage.setItem(times.STORAGE_KEY_NEWEST_DATE, JSON.stringify(new Date(2021, 4, 3)));
+
+            //WHEN
+            const worktimeComplete: Duration = TimeService.calculateWorktimeComplete();
+
+            //THEN
+            expect(worktimeComplete).toMatchObject<Duration>(new Duration(33, 0));
+        }),
         
 
 })

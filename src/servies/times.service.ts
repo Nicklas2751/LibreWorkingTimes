@@ -283,6 +283,18 @@ const TimeService = {
         }
         return calcDurationFromMinutes(worktime.asMinutes());
     },
+    calculateWorktimeComplete(): Duration {
+        const oldestDate = this.loadOldestDate();
+        const newestDate = this.loadNewestDate();
+        if (oldestDate == null || newestDate == null) {
+            return new Duration(0, 0);
+        }
+        //Clear time
+        oldestDate.setHours(0,0,0,0);
+        newestDate.setHours(0,0,0,0);
+
+        return this.calculateWorktimeForTimeRange(oldestDate, newestDate);
+    },
 
 }
 

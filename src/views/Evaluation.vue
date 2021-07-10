@@ -13,22 +13,22 @@
           <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Überstunden Aktueller Monat</ion-card-title>
+                <ion-card-title>Überstunden Aktuelle Woche</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
-                {{ formatDuration(currentMonthOvertime) }}
+                {{ formatDuration(currentWeekOvertime) }}
               </ion-card-content>
             </ion-card>
           </ion-col>
           <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Überstunden Aktuelle Woche</ion-card-title>
+                <ion-card-title>Arbeitszeit Aktuelle Woche</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
-                {{ formatDuration(currentWeekOvertime) }}
+                {{ formatDuration(currentWeekWorktime) }}
               </ion-card-content>
             </ion-card>
           </ion-col>
@@ -45,14 +45,38 @@
               </ion-card-content>
             </ion-card>
           </ion-col>
-          <ion-col size="12" size-md="6">
+                    <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Arbeitszeit Aktuelle Woche</ion-card-title>
+                <ion-card-title>Überstunden Aktueller Monat</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
-                {{ formatDuration(currentWeekWorktime) }}
+                {{ formatDuration(currentMonthOvertime) }}
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="12" size-md="6">
+            <ion-card>
+              <ion-card-header>
+                <ion-card-title>Arbeitszeit Insgesamt</ion-card-title>
+              </ion-card-header>
+
+              <ion-card-content>
+                {{ formatDuration(currentWorktimeComplete) }}
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+                    <ion-col size="12" size-md="6">
+            <ion-card>
+              <ion-card-header>
+                <ion-card-title>Überstunden Insgesamt</ion-card-title>
+              </ion-card-header>
+
+              <ion-card-content>
+                {{ formatDuration(currentOvertimeComplete) }}
               </ion-card-content>
             </ion-card>
           </ion-col>
@@ -144,6 +168,12 @@ export default defineComponent({
       weekEnd.setHours(0, 0, 0, 0);
 
       return TimeService.calculateOvertimeForTimeRange(weekStart, weekEnd);
+    },
+    currentOvertimeComplete() {
+      return TimeService.calculateOvertimeComplete();
+    },
+    currentWorktimeComplete() {
+      return TimeService.calculateWorktimeComplete();
     },
   },
 });
