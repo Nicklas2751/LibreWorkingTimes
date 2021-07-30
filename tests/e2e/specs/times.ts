@@ -65,9 +65,9 @@ describe("Times overview", () => {
 
     //WHEN
     //Open type dialog
-    cy.get("#times-new-entry-"+dateDayString+" #times-new-entry-type-select").click({force: true});
+    cy.get("#times-new-entry-"+dateDayString+" #times-new-entry-type-select").should('be.visible').click({force: true});
     //Check type
-    cy.get("#alert-input-3-3").click();
+    cy.get(".alert-radio-group > :nth-child(4)").click();
     //Set type
     cy.get(".alert-button-group > :nth-child(2) > .alert-button-inner").click();
     
@@ -103,9 +103,9 @@ describe("Times overview", () => {
 
     //WHEN
     //Open type dialog
-    cy.get("#times-new-entry-"+dayString+" #times-new-entry-type-select").click({force: true});
+    cy.get("#times-new-entry-"+dayString+" #times-new-entry-type-select").should('be.visible').click({force: true});
     //Check type
-    cy.get("#alert-input-6-2").click();
+    cy.get(".alert-radio-group > :nth-child(3)").click();
     //Set type
     cy.get(".alert-button-group > :nth-child(2) > .alert-button-inner").click();
     
@@ -126,9 +126,9 @@ describe("Times overview", () => {
 
     //WHEN
     //Open type dialog
-    cy.get("#times-new-entry-"+dayString+" #times-new-entry-type-select").click({force: true});
+    cy.get("#times-new-entry-"+dayString+" #times-new-entry-type-select").should('be.visible').click({force: true});
     //Check type
-    cy.get("#alert-input-8-1").click();
+    cy.get(".alert-radio-group > :nth-child(2)").click();
     //Set type
     cy.get(".alert-button-group > :nth-child(2) > .alert-button-inner").click();
     
@@ -150,9 +150,9 @@ describe("Times overview", () => {
 
     //WHEN
     //Open type dialog
-    cy.get("#times-new-entry-"+dayString+" #times-new-entry-type-select").click({force: true});
+    cy.get("#times-new-entry-"+dayString+" #times-new-entry-type-select").should('be.visible').click({force: true});
     //Check type
-    cy.get("#alert-input-10-1").click();
+    cy.get(".alert-radio-group > :nth-child(2)").click();
     //Set type
     cy.get(".alert-button-group > :nth-child(2) > .alert-button-inner").click();
     //Change mode to add
