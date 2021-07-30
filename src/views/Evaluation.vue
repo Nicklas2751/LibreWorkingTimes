@@ -81,6 +81,19 @@
             </ion-card>
           </ion-col>
         </ion-row>
+        <ion-row>
+          <ion-col size="12" size-md="6">
+            <ion-card>
+              <ion-card-header>
+                <ion-card-title>Arbeitszeiten und Überstunden Entwicklung</ion-card-title>
+              </ion-card-header>
+
+              <ion-card-content>
+                <div class="ct-chart ct-perfect-fourth"></div>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
       </ion-grid>
     </ion-content>
   </ion-page>
@@ -102,10 +115,26 @@ import {
   IonCardContent,
   IonCardHeader,
   IonCardTitle,
+  onIonViewDidEnter,
 } from "@ionic/vue";
 import { defineComponent } from "vue";
 import moment from "moment";
 import { Duration } from "@/types";
+import * as Chartist from "chartist";
+
+function createLabelsForLastSixMonthsIncludingCurrent(): string[] {
+  const monthNameLabels: string[] = [];
+  for(let monthModifier = 6; monthModifier > 0; monthModifier--) {
+    const date = new Date();
+    date.setDate(1);
+    //TODO remove the monthModifier from the date months respecting a year change
+    monthNameLabels.push(date.toLocaleDateString(navigator.language, {
+        month: 'long',
+        year: 'numeric'
+      }));
+  }
+  return monthNameLabels;
+}
 
 export default defineComponent({
   name: "Auswertung",
@@ -124,13 +153,30 @@ export default defineComponent({
     IonCardHeader,
     IonCardTitle,
   },
+  setup() {
+    onIonViewDidEnter(() => {
+      new Chartist.Line('.ct-chart', {
+        labels: createLabelsForLastSixMonthsIncludingCurrent(),
+        series: [
+          [12, 9, 7, 8, 5],
+          [2, 1, 3.5, 7, 3],
+          [1, 3, 4, 5, 6]
+        ]
+      }, {
+        fullWidth: true,
+        chartPadding: {
+          right: 40
+        }
+      });
+    });
+  },
   methods: {
     formatDuration(duration: Duration | undefined): string {
       if (duration) {
         return duration.toString();
       }
       return "0:00";
-    },
+    }
   },
   computed: {
     currentMonthWorktime() {
