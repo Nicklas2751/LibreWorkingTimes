@@ -89,7 +89,10 @@
               </ion-card-header>
 
               <ion-card-content>
-                <div class="ct-chart ct-perfect-fourth"></div>
+                <LineChart :chartData="chartData" :options="chartOptions" /><br/>
+                <b>Durchschnitt:</b><br/>
+                Arbeitszeit: {{ calcAverageWorktime() }} Stunden im Monat <br/>
+                Überstunden: {{ calcAverageOvertime() }} Stunden im Monat
               </ion-card-content>
             </ion-card>
           </ion-col>
@@ -115,25 +118,76 @@ import {
   IonCardContent,
   IonCardHeader,
   IonCardTitle,
-  onIonViewDidEnter,
 } from "@ionic/vue";
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import moment from "moment";
 import { Duration } from "@/types";
-import * as Chartist from "chartist";
+import { LineChart } from 'vue-chart-3'
+import { Chart, ChartOptions, registerables } from "chart.js";
 
 function createLabelsForLastSixMonthsIncludingCurrent(): string[] {
   const monthNameLabels: string[] = [];
-  for(let monthModifier = 6; monthModifier > 0; monthModifier--) {
+  for(let monthModifier = 5; monthModifier >= 0; monthModifier--) {
     const date = new Date();
     date.setDate(1);
-    //TODO remove the monthModifier from the date months respecting a year change
+    date.setMonth(date.getMonth() - monthModifier);
     monthNameLabels.push(date.toLocaleDateString(navigator.language, {
-        month: 'long',
+        month: 'short',
         year: 'numeric'
       }));
   }
   return monthNameLabels;
+}
+
+function durationToHoursDecimal(duration: Duration): number {
+  let hours = 0;
+  hours += duration.hours;
+  if(duration.minutes > 0)
+  {
+    hours += 60.0 / duration.minutes;
+  }
+  return hours;
+}
+
+function loadWorktimesForLastSixMonthsIncludingCurrent(): number[] {
+  const worktimes: number[] = [];
+  for(let monthModifier = 5; monthModifier >= 0; monthModifier--) {
+    const monthBegin = new Date();
+    monthBegin.setDate(1);
+    monthBegin.setMonth(monthBegin.getMonth() - monthModifier);
+    monthBegin.setHours(0, 0, 0, 0);
+
+    const monthEnd = new Date();
+    monthEnd.setMonth(monthEnd.getMonth() - monthModifier + 1);
+    monthEnd.setDate(0);
+    monthEnd.setHours(0, 0, 0, 0);
+
+    worktimes.push(durationToHoursDecimal(TimeService.calculateWorktimeForTimeRange(monthBegin, monthEnd)));
+  }
+  return worktimes;
+}
+
+function loadOvertimesForLastSixMonthsIncludingCurrent(): number[] {
+  const overimes: number[] = [];
+  for(let monthModifier = 5; monthModifier >= 0; monthModifier--) {
+    const monthBegin = new Date();
+    monthBegin.setDate(1);
+    monthBegin.setMonth(monthBegin.getMonth() - monthModifier);
+    monthBegin.setHours(0, 0, 0, 0);
+
+    const monthEnd = new Date();
+    monthEnd.setDate(1);
+    monthEnd.setMonth(monthEnd.getMonth() - monthModifier + 1);
+    monthEnd.setDate(0);
+    monthEnd.setHours(0, 0, 0, 0);
+    overimes.push(durationToHoursDecimal(TimeService.calculateOvertimeForTimeRange(monthBegin, monthEnd)));
+  }
+  return overimes;
+}
+
+function averageOfArrayWholeNumber(data: number[]): number
+{
+  return Math.round(data.reduce((a,b) => a + b, 0) / data.length);
 }
 
 export default defineComponent({
@@ -152,23 +206,73 @@ export default defineComponent({
     IonCardContent,
     IonCardHeader,
     IonCardTitle,
+    LineChart,
   },
   setup() {
-    onIonViewDidEnter(() => {
-      new Chartist.Line('.ct-chart', {
-        labels: createLabelsForLastSixMonthsIncludingCurrent(),
-        series: [
-          [12, 9, 7, 8, 5],
-          [2, 1, 3.5, 7, 3],
-          [1, 3, 4, 5, 6]
-        ]
-      }, {
-        fullWidth: true,
-        chartPadding: {
-          right: 40
+    Chart.register(...registerables);
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+    let chartOptions: any;
+    
+    if(prefersDark.matches)
+    {
+      chartOptions = ref<ChartOptions<'line'>>({
+        responsive: true,
+        color: 'rgba(255, 255, 255, 1)',
+        plugins: {
+          legend: {
+            position: 'top'
+          }
+        },
+        scales: {
+          x: {
+            grid: {
+              color: 'rgba(255, 255, 255, 0.3)'
+            },
+            ticks: {
+              color: 'rgba(255, 255, 255, 0.8)',
+            }
+          },
+          y: {
+            grid: {
+              color: 'rgba(255, 255, 255, 0.3)'
+            },
+            ticks: {
+              color: 'rgba(255, 255, 255, 0.8)',
+            }
+          }
         }
       });
-    });
+    } else {
+      chartOptions = ref<ChartOptions<'line'>>({
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top'
+          }
+        }
+      });
+    }
+    
+    const chartData = {
+      labels: createLabelsForLastSixMonthsIncludingCurrent(),
+      datasets: [
+        {
+          label: 'Arbeitszeiten',
+          data: loadWorktimesForLastSixMonthsIncludingCurrent(),
+          backgroundColor: '#36a2eb',
+          borderColor: '#36a2eb',
+        },
+        {
+          label: 'Überstunden',
+          data: loadOvertimesForLastSixMonthsIncludingCurrent(),
+          backgroundColor: '#ff6384',
+          borderColor: '#ff6384',
+        }
+      ],
+    };
+
+  return { chartData, chartOptions };
   },
   methods: {
     formatDuration(duration: Duration | undefined): string {
@@ -176,6 +280,12 @@ export default defineComponent({
         return duration.toString();
       }
       return "0:00";
+    },
+    calcAverageWorktime(): number {
+      return averageOfArrayWholeNumber(loadWorktimesForLastSixMonthsIncludingCurrent());
+    },
+    calcAverageOvertime(): number {
+      return averageOfArrayWholeNumber(loadOvertimesForLastSixMonthsIncludingCurrent())
     }
   },
   computed: {

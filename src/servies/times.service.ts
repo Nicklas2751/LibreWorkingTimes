@@ -16,8 +16,6 @@ function calcDurationFromMinutes(completeMinutes: number): Duration {
     const roundedMinutes = Math.round(minutes);
     return new Duration(completeMinutes < 0 ? -roundedHours : roundedHours, roundedMinutes, completeMinutes < 0);
 }
-//TODO save oldest and newest date for statistics and to show things in future always
-// also scroll to today
 
 const dateForSavingOptions: Intl.DateTimeFormatOptions = { day: "2-digit", month: "2-digit", year: "numeric" };
 
