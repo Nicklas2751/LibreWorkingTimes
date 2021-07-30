@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { IonApp, IonContent, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonMenu, IonMenuToggle, IonNote, IonRouterOutlet, IonSplitPane } from '@ionic/vue';
-import { defineComponent, ref } from 'vue';
+import { defineComponent } from 'vue';
 import { useRoute } from 'vue-router';
 import { calendarNumberOutline, calendarOutline, calendarSharp, pieChart, pieChartOutline, pieChartSharp, settings, settingsOutline, settingsSharp } from 'ionicons/icons';
 
