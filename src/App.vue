@@ -8,7 +8,7 @@
             <ion-note>Nicklas @ Work</ion-note>
   
             <ion-menu-toggle auto-hide="false" v-for="(p, i) in appPages" :key="i">
-              <ion-item @click="selectedIndex = i" router-direction="root" :router-link="p.url" lines="none" detail="false" class="hydrated" :class="{ selected: selectedIndex === i }">
+              <ion-item router-direction="root" :router-link="p.url" lines="none" detail="false" class="hydrated" :class="{ selected: selectedIndex() === i }">
                 <ion-icon slot="start" :ios="p.iosIcon" :md="p.mdIcon"></ion-icon>
                 <ion-label>{{ p.title }}</ion-label>
               </ion-item>
@@ -60,7 +60,6 @@ export default defineComponent({
     IonSplitPane,
   },
   setup() {
-    const selectedIndex = ref(0);
     const appPages = [
       {
         title: 'Zeiten',
@@ -85,15 +84,23 @@ export default defineComponent({
     const route = useRoute();
     
     return { 
-      selectedIndex,
       appPages, 
       calendarNumberOutline, 
       calendarSharp, 
       pieChartOutline, 
       pieChartSharp, 
       settingsOutline, 
-      settingsSharp, 
-      isSelected: (url: string) => url === route.path ? 'selected' : ''
+      settingsSharp,
+      selectedIndex(): number {
+        for(let i = 0; i < appPages.length; i++)
+        {
+          if (route.path === appPages[i].url)
+          {
+            return i;
+          }
+        }
+        return 0;
+      }
     }
   }
 });
