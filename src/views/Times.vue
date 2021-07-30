@@ -418,7 +418,6 @@ export default defineComponent({
       this.months.push(currentMonth);
 
       this.monthModifier++;
-      console.log("Month modifier after: "+this.monthModifier);
     },
     async deleteEntryForDay(day: Day) {
       if (day.entry) {
