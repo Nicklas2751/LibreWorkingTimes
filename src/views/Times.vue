@@ -310,8 +310,18 @@ export default defineComponent({
       this.loadCompleteOvertime();
     },
     loadTodayEntry() {
-      const current = TimeService.loadEntryForDate(new Date());
-      if (current == null) {
+      let current: Entry | null = null;
+      if(TimeService.isWorkStartActive())
+      {
+        current = TimeService.loadActiveWorkEntry();
+      }
+
+      if(current === null)
+      {
+        current = TimeService.loadEntryForDate(new Date());
+      }
+
+      if (current === null) {
         this.current = {
           start: new Date(),
           fullDay: false,
@@ -485,18 +495,24 @@ export default defineComponent({
         header: "Quick actions",
         buttons: [
           {
-            text: "Come",
+            text: TimeService.isWorkStartActive() ? "Stop work" : "Start work",
             icon: add,
             handler: () => {
-              if (todayDayElement) {
-                todayDayElement.entry = {
-                  start: new Date(),
-                  fullDay: false,
-                  type: EntryType.WORK,
-                };
+              if(TimeService.isWorkStartActive())
+              {
+                TimeService.stopWork();
+              } else {
+                if (todayDayElement) {
+                  todayDayElement.entry = {
+                    start: new Date(),
+                    fullDay: false,
+                    type: EntryType.WORK,
+                  };
 
-                TimeService.saveEntryForDate(new Date(), todayDayElement.entry);
-                this.loadStatistics();
+                  TimeService.saveEntryForDate(new Date(), todayDayElement.entry);
+                  TimeService.saveWorkStart(todayDayElement.entry);
+                  this.loadStatistics();
+                }
               }
             },
           },

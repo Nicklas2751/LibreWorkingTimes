@@ -6,6 +6,7 @@ import SettingsService from "./settings.service";
 export const STORAGE_KEY_ENTRY = "WorkTimeEntry";
 export const STORAGE_KEY_NEWEST_DATE = "NewestTimesEntryDate";
 export const STORAGE_KEY_OLDEST_DATE = "OldestTimesEntryDate";
+export const STORAGE_KEY_CURRENT_WORKSTART = "CurrentWorkStartEntry";
 
 function calcDurationFromMinutes(completeMinutes: number): Duration {
 
@@ -19,7 +20,7 @@ function calcDurationFromMinutes(completeMinutes: number): Duration {
 
 const dateForSavingOptions: Intl.DateTimeFormatOptions = { day: "2-digit", month: "2-digit", year: "numeric" };
 
-function dateToDateForSaving(date: Date) {
+export function dateToDateForSaving(date: Date) {
     return date.toLocaleDateString(navigator.language, dateForSavingOptions);
 }
 
@@ -57,14 +58,16 @@ function isSameDate(first: Date, second: Date) {
 
 function saveNewestDate(date: Date) {
     //Clear time
-    date.setHours(0,0,0,0);
-    localStorage.setItem(STORAGE_KEY_NEWEST_DATE, JSON.stringify(date));
+    const clearedDate = new Date(date);
+    clearedDate.setHours(0,0,0,0);
+    localStorage.setItem(STORAGE_KEY_NEWEST_DATE, JSON.stringify(clearedDate));
 }
 
 function saveOldestDate(date: Date) {
     //Clear time
-    date.setHours(0,0,0,0);
-    localStorage.setItem(STORAGE_KEY_OLDEST_DATE, JSON.stringify(date));
+    const clearedDate = new Date(date);
+    clearedDate.setHours(0,0,0,0);
+    localStorage.setItem(STORAGE_KEY_OLDEST_DATE, JSON.stringify(clearedDate));
 }
 
 
@@ -293,6 +296,55 @@ const TimeService = {
 
         return this.calculateWorktimeForTimeRange(oldestDate, newestDate);
     },
+    saveWorkStart(workstartEntry: Entry) {
+        localStorage.setItem(STORAGE_KEY_CURRENT_WORKSTART,STORAGE_KEY_ENTRY + dateToDateForSaving(workstartEntry.start));
+    },
+    isWorkStartActive(): boolean {
+        const currentWorkStartKey: string | null = localStorage.getItem(STORAGE_KEY_CURRENT_WORKSTART);
+        
+        if(currentWorkStartKey === null) {
+            return false;
+        }
+
+        const workstartEntry = this.loadEntryFromJson(localStorage.getItem(currentWorkStartKey));
+
+        if(workstartEntry === null) {
+            return false;
+        }
+
+        if(workstartEntry.end)
+        {
+            return false;
+        }
+
+        return true;
+    },
+    loadActiveWorkEntry(): Entry | null {
+        const currentWorkStartKey: string | null = localStorage.getItem(STORAGE_KEY_CURRENT_WORKSTART);
+        
+        if(currentWorkStartKey === null) {
+            return null;
+        } 
+
+        return this.loadEntryFromJson(localStorage.getItem(currentWorkStartKey));
+    },
+    stopWork() {
+        const currentWorkStartKey: string | null = localStorage.getItem(STORAGE_KEY_CURRENT_WORKSTART);
+        localStorage.removeItem(STORAGE_KEY_CURRENT_WORKSTART);
+
+        if(currentWorkStartKey === null) {
+            return; //Nothing to do
+        }        
+
+        const workstartEntry = this.loadEntryFromJson(localStorage.getItem(currentWorkStartKey));
+
+        if(workstartEntry === null) {
+            return; // Entry unkown
+        }
+
+       workstartEntry.end = new Date();
+       this.saveEntryForDate(workstartEntry.start, this.calculateEntry(workstartEntry));
+    }
 
 }
 

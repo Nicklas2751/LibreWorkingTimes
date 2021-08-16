@@ -1,6 +1,6 @@
-import TimeService from "@/servies/times.service"
-import * as times from "@/servies/times.service"
-import { Duration, Entry, EntryType } from "@/types"
+import TimeService from "../../src/servies/times.service"
+import * as times from "../../src/servies/times.service"
+import { Duration, Entry, EntryType } from "../../src/types"
 
 describe('times.service.ts', () => {
     it('calculate positive work entry worktime minutes', () => {
@@ -952,6 +952,180 @@ describe('times.service.ts', () => {
 
         //THEN
         expect(worktimeComplete).toMatchObject<Duration>(new Duration(33, 0));
+    }),
+
+    it('saveWorkStart save new workstart workstart points to right entry', () => {
+
+        //GIVEN
+        localStorage.clear();
+        
+        //WHEN
+        const workStartTime = new Date();
+        const workStartEntry: Entry = {
+            fullDay: false,
+            start: workStartTime,
+            type: EntryType.WORK
+        };
+        TimeService.saveWorkStart(workStartEntry);
+
+        //THEN
+        expect(localStorage.getItem(times.STORAGE_KEY_CURRENT_WORKSTART)).toEqual(times.STORAGE_KEY_ENTRY+times.dateToDateForSaving(workStartTime));
+    }),
+
+    it('isWorkStartActive save workstart returns true', () => {
+
+        //GIVEN
+        localStorage.clear();
+        
+        //WHEN
+        const workStartTime = new Date();
+        const workStartEntry: Entry = {
+            fullDay: false,
+            start: workStartTime,
+            type: EntryType.WORK
+        };
+        TimeService.saveEntryForDate(workStartEntry.start, workStartEntry);
+        TimeService.saveWorkStart(workStartEntry);
+        const isWorkStartActive: boolean = TimeService.isWorkStartActive();
+
+        //THEN
+        expect(isWorkStartActive).toBeTruthy();
+    }),
+
+    it('isWorkStartActive save no workstart return false', () => {
+
+        //GIVEN
+        localStorage.clear();
+        
+        //WHEN
+        const isWorkStartActive: boolean = TimeService.isWorkStartActive();
+
+        //THEN
+        expect(isWorkStartActive).toBeFalsy();
+    }),
+
+    it('isWorkStartActive save workstart with end return false', () => {
+
+        //GIVEN
+        localStorage.clear();
+        const workStartTime = new Date();
+        const workStartEntry: Entry = {
+            fullDay: false,
+            start: workStartTime,
+            end: new Date(),
+            type: EntryType.WORK
+        };
+        TimeService.saveEntryForDate(workStartEntry.start, workStartEntry);
+        TimeService.saveWorkStart(workStartEntry);
+
+        //WHEN
+        const isWorkStartActive: boolean = TimeService.isWorkStartActive();
+
+        //THEN
+        expect(isWorkStartActive).toBeFalsy();
+    }),
+
+    it('isWorkStartActive save workstart without saved entry return false', () => {
+
+        //GIVEN
+        localStorage.clear();
+        const workStartTime = new Date();
+        const workStartEntry: Entry = {
+            fullDay: false,
+            start: workStartTime,
+            end: new Date(),
+            type: EntryType.WORK
+        };
+        TimeService.saveWorkStart(workStartEntry);
+
+        //WHEN
+        const isWorkStartActive: boolean = TimeService.isWorkStartActive();
+
+        //THEN
+        expect(isWorkStartActive).toBeFalsy();
+    }),
+
+    it('stopWork isWorkStartActive returns false', () => {
+
+        //GIVEN
+        localStorage.clear();
+        const workStartTime = new Date();
+        const workStartEntry: Entry = {
+            fullDay: false,
+            start: workStartTime,
+            type: EntryType.WORK
+        };
+        TimeService.saveEntryForDate(workStartEntry.start, workStartEntry);
+        TimeService.saveWorkStart(workStartEntry);
+
+        //WHEN
+        TimeService.stopWork();
+
+        //THEN
+        const isWorkStartActive: boolean = TimeService.isWorkStartActive();
+        expect(isWorkStartActive).toBeFalsy();
+    }),
+
+    it('stopWork work start entry has end date set', () => {
+
+        //GIVEN
+        localStorage.clear();
+        const workStartTime = new Date();
+        const workStartEntry: Entry = {
+            fullDay: false,
+            start: workStartTime,
+            type: EntryType.WORK
+        };
+        TimeService.saveEntryForDate(workStartEntry.start, workStartEntry);
+        TimeService.saveWorkStart(workStartEntry);
+
+        //WHEN
+        TimeService.stopWork();
+
+        //THEN
+        const updatedWorkStartEntry: Entry | null = TimeService.loadEntryForDate(workStartEntry.start);
+        expect(updatedWorkStartEntry?.end).not.toBeNull();
+    }),
+
+    it('stopWork work start entry is calculated', () => {
+
+        //GIVEN
+        localStorage.clear();
+        const workStartTime = new Date();
+        const workStartEntry: Entry = {
+            fullDay: false,
+            start: workStartTime,
+            type: EntryType.WORK
+        };
+        TimeService.saveEntryForDate(workStartEntry.start, workStartEntry);
+        TimeService.saveWorkStart(workStartEntry);
+
+        //WHEN
+        TimeService.stopWork();
+
+        //THEN
+        const updatedWorkStartEntry: Entry | null = TimeService.loadEntryForDate(workStartEntry.start);
+        expect(updatedWorkStartEntry?.worktime).not.toBeNull();
+    }),
+
+    it('loadActiveWorkEntry started work entry is loaded', () => {
+
+        //GIVEN
+        localStorage.clear();
+        const workStartTime = new Date();
+        const workStartEntry: Entry = {
+            fullDay: false,
+            start: workStartTime,
+            type: EntryType.WORK
+        };
+        TimeService.saveEntryForDate(workStartEntry.start, workStartEntry);
+        TimeService.saveWorkStart(workStartEntry);
+
+        //WHEN
+        const loadedActiveWorkEntry: Entry | null = TimeService.loadActiveWorkEntry();
+
+        //THEN
+        expect(loadedActiveWorkEntry).toMatchObject<Entry>(workStartEntry);
     })
     
 })
