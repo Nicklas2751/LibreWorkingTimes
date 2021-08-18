@@ -13,7 +13,7 @@
           <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Überstunden Aktuelle Woche</ion-card-title>
+                <ion-card-title>Überstunden aktuelle Woche</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
@@ -24,7 +24,7 @@
           <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Arbeitszeit Aktuelle Woche</ion-card-title>
+                <ion-card-title>Arbeitszeit aktuelle Woche</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
@@ -37,7 +37,7 @@
           <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Arbeitszeit Aktueller Monat</ion-card-title>
+                <ion-card-title>Arbeitszeit aktueller Monat</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
@@ -45,14 +45,60 @@
               </ion-card-content>
             </ion-card>
           </ion-col>
-                    <ion-col size="12" size-md="6">
+          <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Überstunden Aktueller Monat</ion-card-title>
+                <ion-card-title>Überstunden aktueller Monat</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
                 {{ formatDuration(currentMonthOvertime) }}
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+          <ion-col size="12" size-md="6">
+            <ion-card>
+              <ion-card-header>
+                <ion-card-title>Krankheitstage aktueller Monat</ion-card-title>
+              </ion-card-header>
+
+              <ion-card-content>
+                {{ currentMonthIllDays }}
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+          <ion-col size="12" size-md="6">
+            <ion-card>
+              <ion-card-header>
+                <ion-card-title>Urlaubstage aktueller Monat</ion-card-title>
+              </ion-card-header>
+
+              <ion-card-content>
+                {{ currentMonthVacationDays }}
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="12" size-md="6">
+            <ion-card>
+              <ion-card-header>
+                <ion-card-title>Krankheitstage aktuelles Jahr</ion-card-title>
+              </ion-card-header>
+
+              <ion-card-content>
+                {{ currentYearIllDays }}
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+          <ion-col size="12" size-md="6">
+            <ion-card>
+              <ion-card-header>
+                <ion-card-title>Urlaubstage aktuelles Jahr</ion-card-title>
+              </ion-card-header>
+
+              <ion-card-content>
+                {{ currentYearVacationDays }}
               </ion-card-content>
             </ion-card>
           </ion-col>
@@ -190,6 +236,58 @@ function averageOfArrayWholeNumber(data: number[]): number
   return Math.round(data.reduce((a,b) => a + b, 0) / data.length);
 }
 
+function clearTime(date: Date) {
+  date.setHours(0, 0, 0, 0);
+}
+
+function startOfMonth(): Date
+{
+  const monthStart = moment().startOf("month").toDate();
+  //Clear time
+  clearTime(monthStart);
+  return monthStart;
+}
+
+function endOfMonth(): Date
+{
+  const monthEnd = moment().endOf("month").toDate();
+  //Clear time
+  clearTime(monthEnd);
+  return monthEnd;
+}
+
+function startOfWeek(): Date
+{
+  const weekStart = moment().startOf("week").toDate();
+  //Clear time
+  clearTime(weekStart);
+  return weekStart;
+}
+
+function endOfWeek(): Date
+{
+  const weekEnd = moment().endOf("week").toDate();
+  //Clear time
+  clearTime(weekEnd);
+  return weekEnd;
+}
+
+function startOfYear(): Date
+{
+  const yearStart = moment().startOf("year").toDate();
+  //Clear time
+  clearTime(yearStart);
+  return yearStart;
+}
+
+function endOfYear(): Date
+{
+  const yearEnd = moment().endOf("year").toDate();
+  //Clear time
+  clearTime(yearEnd);
+  return yearEnd;
+}
+
 export default defineComponent({
   name: "Auswertung",
   components: {
@@ -290,46 +388,34 @@ export default defineComponent({
   },
   computed: {
     currentMonthWorktime() {
-      const monthStart = moment().startOf("month").toDate();
-      const monthEnd = moment().endOf("month").toDate();
-      //Clear time
-      monthStart.setHours(0, 0, 0, 0);
-      monthEnd.setHours(0, 0, 0, 0);
-
-      return TimeService.calculateWorktimeForTimeRange(monthStart, monthEnd);
+      return TimeService.calculateWorktimeForTimeRange(startOfMonth(), endOfMonth());
     },
     currentWeekWorktime() {
-      const weekStart = moment().startOf("week").toDate();
-      const weekEnd = moment().endOf("week").toDate();
-      //Clear time
-      weekStart.setHours(0, 0, 0, 0);
-      weekEnd.setHours(0, 0, 0, 0);
-
-      return TimeService.calculateWorktimeForTimeRange(weekStart, weekEnd);
+      return TimeService.calculateWorktimeForTimeRange(startOfWeek(), endOfWeek());
     },
     currentMonthOvertime() {
-      const monthStart = moment().startOf("month").toDate();
-      const monthEnd = moment().endOf("month").toDate();
-      //Clear time
-      monthStart.setHours(0, 0, 0, 0);
-      monthEnd.setHours(0, 0, 0, 0);
-
-      return TimeService.calculateOvertimeForTimeRange(monthStart, monthEnd);
+      return TimeService.calculateOvertimeForTimeRange(startOfMonth(), endOfMonth());
     },
     currentWeekOvertime() {
-      const weekStart = moment().startOf("week").toDate();
-      const weekEnd = moment().endOf("week").toDate();
-      //Clear time
-      weekStart.setHours(0, 0, 0, 0);
-      weekEnd.setHours(0, 0, 0, 0);
-
-      return TimeService.calculateOvertimeForTimeRange(weekStart, weekEnd);
+      return TimeService.calculateOvertimeForTimeRange(startOfWeek(), endOfWeek());
     },
     currentOvertimeComplete() {
       return TimeService.calculateOvertimeComplete();
     },
     currentWorktimeComplete() {
       return TimeService.calculateWorktimeComplete();
+    },
+    currentMonthIllDays() {
+       return TimeService.calculateIllDaysForTimeRange(startOfMonth(), endOfMonth());
+    },
+    currentMonthVacationDays() {
+       return TimeService.calculateVacationDaysForTimeRange(startOfMonth(), endOfMonth());
+    },
+    currentYearIllDays() {
+       return TimeService.calculateIllDaysForTimeRange(startOfYear(), endOfYear());
+    },
+    currentYearVacationDays() {
+       return TimeService.calculateVacationDaysForTimeRange(startOfYear(), endOfYear());
     },
   },
 });
