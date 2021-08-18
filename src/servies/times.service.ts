@@ -198,12 +198,12 @@ const TimeService = {
             updatedEntry.end = new Date();
         }
 
-        const dailyWorktime: Duration = SettingsService.getNeededDailyWorktime();
+        const dailyWorktime: Duration = SettingsService.worktime.value;
 
         if (updatedEntry.type === EntryType.WORK) {
 
             if (!entry.pausetime) {
-                entry.pausetime = SettingsService.getDailyPausetime();
+                entry.pausetime = SettingsService.breaktime.value;
             }
 
             let worktimeDuration: moment.Duration;
@@ -238,8 +238,8 @@ const TimeService = {
         return updatedEntry;
     },
     calculatePerfectEnd(start: Date, pausetime?: Duration | undefined): Date {
-        const dailyWorktime: Duration = SettingsService.getNeededDailyWorktime();
-        const dailyPausetime: Duration = pausetime ? pausetime : SettingsService.getDailyPausetime();
+        const dailyWorktime: Duration = SettingsService.worktime.value;
+        const dailyPausetime: Duration = pausetime ? pausetime : SettingsService.breaktime.value;
 
         const totalDailyDuration: moment.Duration = durationToMomentJSDuration(dailyWorktime).add(durationToMomentJSDuration(dailyPausetime));
         return moment(start).add(totalDailyDuration).toDate();

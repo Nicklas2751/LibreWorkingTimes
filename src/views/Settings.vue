@@ -9,24 +9,20 @@
     </ion-header>
     <ion-content>
       <ion-item>
-        <ion-label position="floating">Benutzername</ion-label>
-        <ion-input id="settings-username" :value="username" required></ion-input>
-      </ion-item>
-      <ion-item>
         <ion-label position="floating">Bezeichnung</ion-label>
-        <ion-input id="settings-description" :value="description" required></ion-input>
+        <ion-input id="settings-description" v-model="description" required></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="floating">Tägliche Arbeitszeit</ion-label>
-        <ion-datetime id="settings-dailyWorktime" display-format="HH:mm" picker-format="HH:mm" :value="dailyWorktime"></ion-datetime>
+        <ion-datetime id="settings-dailyWorktime" display-format="HH:mm" picker-format="HH:mm" v-model="workTime"></ion-datetime>
       </ion-item>
       <ion-item>
         <ion-label position="floating">Typische Pausendauer</ion-label>
-        <ion-datetime id="settings-breakTime" display-format="HH:mm" picker-format="HH:mm" :value="breakTime"></ion-datetime>
+        <ion-datetime id="settings-breakTime" display-format="HH:mm" picker-format="HH:mm" v-model="breakTime"></ion-datetime>
       </ion-item>
       <ion-item>
         <ion-label position="floating">Arbeitstage</ion-label>
-        <ion-select multiple="true" cancel-text="Abbrechen" ok-text="Ok" :value="workDays" required>
+        <ion-select multiple="true" cancel-text="Abbrechen" ok-text="Ok"   v-model="workDays" required>
           <ion-select-option v-bind:key="dayName" v-for="dayName in ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']" :value="dayName.toLowerCase()">{{ dayName }}</ion-select-option>
       </ion-select>
       </ion-item>
@@ -35,22 +31,69 @@
 </template>
 
 <script lang="ts">
+import SettingsService from "@/servies/settings.service";
+import { Duration } from "@/types";
 import {
   IonPage,
-  IonContent
+  IonContent,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonMenuButton,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonDatetime,
+  IonSelect,
+  IonSelectOption
 } from "@ionic/vue";
 import { defineComponent } from "vue";
 
+function durationToFakeDate(duration: Duration): Date {
+  return new Date(0, 0, 0, duration.isNegative ? duration.hours * -1 : duration.hours, duration.minutes);
+}
+
+function fakeDateToDuration(date: Date): Duration {
+  return new Duration(date.getHours(),date.getMinutes(), date.getHours() < 0 || date.getMinutes() < 0);
+}
+
 export default defineComponent({
   name: "Einstellungen",
-  username: "John Doe",
-  description: "John Doe @ Example Corp",
-  dailyWorktime: new Date( 0, 0, 0, 8, 0),
-  breakTime: new Date( 0, 0, 0, 0, 30),
-  workDays: ['montag', 'dienstag', 'mittwoch', 'donnerstag', 'freitag'],
   components: {
     IonPage,
-    IonContent
+    IonContent,
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonMenuButton,
+    IonItem,
+    IonLabel,
+    IonInput,
+    IonDatetime,
+    IonSelect,
+    IonSelectOption
+  },
+  data() {
+    return { 
+      description: SettingsService.description,
+      workTime: durationToFakeDate(SettingsService.worktime.value).toISOString(),
+      breakTime: durationToFakeDate(SettingsService.breaktime.value).toISOString(),
+      workDays: SettingsService.workdays
+    }
+  },
+  watch: {
+    description: function (newVal: string) {
+      SettingsService.setDescription(newVal);
+    },
+    workTime: function (newVal: string) {
+      SettingsService.setWorkTime(fakeDateToDuration(new Date(newVal)));
+    },
+    breakTime: function (newVal: string) {
+      SettingsService.setBreakTime(fakeDateToDuration(new Date(newVal)));
+    },
+    workDays: function (newVal: string[]) {
+      SettingsService.setWorkDays(newVal);
+    },
   },
 });
 </script>

@@ -5,7 +5,7 @@
         <ion-content>
           <ion-list id="inbox-list">
             <ion-list-header>Arbeitszeiten</ion-list-header>
-            <ion-note>Nicklas @ Work</ion-note>
+            <ion-note>{{ description }}</ion-note>
   
             <ion-menu-toggle auto-hide="false" v-for="(p, i) in appPages" :key="i">
               <ion-item router-direction="root" :router-link="p.url" lines="none" detail="false" class="hydrated" :class="{ selected: selectedIndex() === i }">
@@ -26,6 +26,7 @@ import { IonApp, IonContent, IonIcon, IonItem, IonLabel, IonList, IonListHeader,
 import { defineComponent } from 'vue';
 import { useRoute } from 'vue-router';
 import { calendarNumberOutline, calendarOutline, calendarSharp, pieChart, pieChartOutline, pieChartSharp, settings, settingsOutline, settingsSharp } from 'ionicons/icons';
+import SettingsService from "@/servies/settings.service";
 
 
 // Use matchMedia to check the user preference
@@ -101,6 +102,11 @@ export default defineComponent({
         }
         return 0;
       }
+    }
+  },
+  data() {
+    return { 
+      description: SettingsService.description
     }
   }
 });
