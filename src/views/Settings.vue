@@ -22,7 +22,7 @@
       </ion-item>
       <ion-item>
         <ion-label position="floating">Arbeitstage</ion-label>
-        <ion-select multiple="true" cancel-text="Abbrechen" ok-text="Ok"   v-model="workDays" required>
+        <ion-select id="settings-worktimes" multiple="true" cancel-text="Abbrechen" ok-text="Ok"  v-model="workDays" required>
           <ion-select-option v-bind:key="dayName" v-for="dayName in ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']" :value="dayName.toLowerCase()">{{ dayName }}</ion-select-option>
       </ion-select>
       </ion-item>

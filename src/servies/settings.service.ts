@@ -2,7 +2,6 @@ import { Duration } from "../types";
 import { Ref, ref } from 'vue'
 const STORAGE_KEY_WORKTIME = "Settings.WorkTime";
 const STORAGE_KEY_BREAKTIME = "Settings.BreakTime";
-const STORAGE_KEY_USERNAME = "Settings.Username";
 const STORAGE_KEY_DESCRIPTION = "Settings.Description";
 const STORAGE_KEY_WORKDAYS = "Settings.WorkDays";
 
