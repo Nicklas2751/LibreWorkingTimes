@@ -1126,6 +1126,164 @@ describe('times.service.ts', () => {
 
         //THEN
         expect(loadedActiveWorkEntry).toMatchObject<Entry>(workStartEntry);
+    }),
+
+    it('calculateIllDaysForTimeRange - ill days in range - correct ill day amount', () => {
+
+        //GIVEN
+        localStorage.clear();
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/16/2021", JSON.stringify({
+            type: EntryType.ILL,
+            start: new Date(2021, 1, 16, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/17/2021", JSON.stringify({
+            type: EntryType.ILL,
+            start: new Date(2021, 1, 17, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/18/2021", JSON.stringify({
+            type: EntryType.ILL,
+            start: new Date(2021, 1, 18, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_NEWEST_DATE, JSON.stringify(new Date(2021, 1, 18)));
+        localStorage.setItem(times.STORAGE_KEY_OLDEST_DATE, JSON.stringify(new Date(2021, 1, 16)));
+
+        //WHEN
+        const illDayCount: number = TimeService.calculateIllDaysForTimeRange(new Date(2021, 1, 16), new Date(2021, 1, 18));
+
+        //THEN
+        expect(illDayCount).toEqual(3);
+
+    }),
+    it('calculateIllDaysForTimeRange - only last two ill days in range - correct ill day amount', () => {
+
+        //GIVEN
+        localStorage.clear();
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/16/2021", JSON.stringify({
+            type: EntryType.ILL,
+            start: new Date(2021, 1, 16, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/17/2021", JSON.stringify({
+            type: EntryType.ILL,
+            start: new Date(2021, 1, 17, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/18/2021", JSON.stringify({
+            type: EntryType.ILL,
+            start: new Date(2021, 1, 18, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_NEWEST_DATE, JSON.stringify(new Date(2021, 1, 18)));
+        localStorage.setItem(times.STORAGE_KEY_OLDEST_DATE, JSON.stringify(new Date(2021, 1, 16)));
+
+        //WHEN
+        const illDayCount: number = TimeService.calculateIllDaysForTimeRange(new Date(2021, 1, 17), new Date(2021, 1, 18));
+
+        //THEN
+        expect(illDayCount).toEqual(2);
+
+    }),
+    it('calculateIllDaysForTimeRange - only first two ill days in range - correct ill day amount', () => {
+
+        //GIVEN
+        localStorage.clear();
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/16/2021", JSON.stringify({
+            type: EntryType.ILL,
+            start: new Date(2021, 1, 16, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/17/2021", JSON.stringify({
+            type: EntryType.ILL,
+            start: new Date(2021, 1, 17, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/18/2021", JSON.stringify({
+            type: EntryType.ILL,
+            start: new Date(2021, 1, 18, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_NEWEST_DATE, JSON.stringify(new Date(2021, 1, 18)));
+        localStorage.setItem(times.STORAGE_KEY_OLDEST_DATE, JSON.stringify(new Date(2021, 1, 16)));
+
+        //WHEN
+        const illDayCount: number = TimeService.calculateIllDaysForTimeRange(new Date(2021, 1, 16), new Date(2021, 1, 17));
+
+        //THEN
+        expect(illDayCount).toEqual(2);
+
+    }),
+
+    it('calculateVacationDaysForTimeRange - vacation days in range - correct vacation day amount', () => {
+
+        //GIVEN
+        localStorage.clear();
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/16/2021", JSON.stringify({
+            type: EntryType.VACATION,
+            start: new Date(2021, 1, 16, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/17/2021", JSON.stringify({
+            type: EntryType.VACATION,
+            start: new Date(2021, 1, 17, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/18/2021", JSON.stringify({
+            type: EntryType.VACATION,
+            start: new Date(2021, 1, 18, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_NEWEST_DATE, JSON.stringify(new Date(2021, 1, 18)));
+        localStorage.setItem(times.STORAGE_KEY_OLDEST_DATE, JSON.stringify(new Date(2021, 1, 16)));
+
+        //WHEN
+        const vacationDayCount: number = TimeService.calculateVacationDaysForTimeRange(new Date(2021, 1, 16), new Date(2021, 1, 18));
+
+        //THEN
+        expect(vacationDayCount).toEqual(3);
+
+    }),
+    it('calculateVacationDaysForTimeRange - only last two vacation days in range - correct vacation day amount', () => {
+
+        //GIVEN
+        localStorage.clear();
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/16/2021", JSON.stringify({
+            type: EntryType.VACATION,
+            start: new Date(2021, 1, 16, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/17/2021", JSON.stringify({
+            type: EntryType.VACATION,
+            start: new Date(2021, 1, 17, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/18/2021", JSON.stringify({
+            type: EntryType.VACATION,
+            start: new Date(2021, 1, 18, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_NEWEST_DATE, JSON.stringify(new Date(2021, 1, 18)));
+        localStorage.setItem(times.STORAGE_KEY_OLDEST_DATE, JSON.stringify(new Date(2021, 1, 16)));
+
+        //WHEN
+        const vacationDayCount: number = TimeService.calculateVacationDaysForTimeRange(new Date(2021, 1, 17), new Date(2021, 1, 18));
+
+        //THEN
+        expect(vacationDayCount).toEqual(2);
+
+    }),
+    it('calculateVacationDaysForTimeRange - only first two vacation days in range - correct vacation day amount', () => {
+
+        //GIVEN
+        localStorage.clear();
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/16/2021", JSON.stringify({
+            type: EntryType.VACATION,
+            start: new Date(2021, 1, 16, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/17/2021", JSON.stringify({
+            type: EntryType.VACATION,
+            start: new Date(2021, 1, 17, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_ENTRY + "02/18/2021", JSON.stringify({
+            type: EntryType.VACATION,
+            start: new Date(2021, 1, 18, 10, 0),
+        } as Entry));
+        localStorage.setItem(times.STORAGE_KEY_NEWEST_DATE, JSON.stringify(new Date(2021, 1, 18)));
+        localStorage.setItem(times.STORAGE_KEY_OLDEST_DATE, JSON.stringify(new Date(2021, 1, 16)));
+
+        //WHEN
+        const vacationDayCount: number = TimeService.calculateVacationDaysForTimeRange(new Date(2021, 1, 16), new Date(2021, 1, 17));
+
+        //THEN
+        expect(vacationDayCount).toEqual(2);
+
     })
     
 })

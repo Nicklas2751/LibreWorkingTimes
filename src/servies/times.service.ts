@@ -79,6 +79,7 @@ const TimeService = {
         const entryJson = localStorage.getItem(STORAGE_KEY_ENTRY + dateToDateForSaving(date));
         return this.loadEntryFromJson(entryJson);
     },
+
     loadEntryFromJson(entryJson: string | null): Entry | null {
         if (entryJson && entryJson != null) {
             let entry: Entry = JSON.parse(entryJson);
@@ -116,9 +117,11 @@ const TimeService = {
             saveNewestDate(date);
         }
     },
+
     loadOldestDate(): Date | null {
         return parseDate(localStorage.getItem(STORAGE_KEY_OLDEST_DATE));
     },
+
     loadNewestDate(): Date | null {
         return parseDate(localStorage.getItem(STORAGE_KEY_NEWEST_DATE));
     },
@@ -136,6 +139,7 @@ const TimeService = {
             this.findNewNewestDate(date);
         }
     },
+
     findNewOldestDate(oldestDateBefore: Date) {
 
         const newestDate: Date | null = this.loadNewestDate();
@@ -159,6 +163,7 @@ const TimeService = {
             saveOldestDate(newOldestDate);
         }
     },
+
     findNewNewestDate(newestDateBefore: Date) {
 
         const oldestDate: Date | null = this.loadOldestDate();
@@ -237,6 +242,7 @@ const TimeService = {
 
         return updatedEntry;
     },
+
     calculatePerfectEnd(start: Date, pausetime?: Duration | undefined): Date {
         const dailyWorktime: Duration = SettingsService.worktime.value;
         const dailyPausetime: Duration = pausetime ? pausetime : SettingsService.breaktime.value;
@@ -244,6 +250,7 @@ const TimeService = {
         const totalDailyDuration: moment.Duration = durationToMomentJSDuration(dailyWorktime).add(durationToMomentJSDuration(dailyPausetime));
         return moment(start).add(totalDailyDuration).toDate();
     },
+
     calculateOvertimeForTimeRange(start: Date, end: Date): Duration {
         //Clear time
         start.setHours(0,0,0,0);
@@ -258,6 +265,7 @@ const TimeService = {
         }
         return calcDurationFromMinutes(overtime.asMinutes());
     },
+    
     calculateOvertimeComplete(): Duration {
         const oldestDate = this.loadOldestDate();
         const newestDate = this.loadNewestDate();
@@ -270,6 +278,7 @@ const TimeService = {
 
         return this.calculateOvertimeForTimeRange(oldestDate, newestDate);
     },
+
     calculateWorktimeForTimeRange(start: Date, end: Date): Duration {
         //Clear time
         start.setHours(0,0,0,0);
@@ -284,6 +293,7 @@ const TimeService = {
         }
         return calcDurationFromMinutes(worktime.asMinutes());
     },
+
     calculateWorktimeComplete(): Duration {
         const oldestDate = this.loadOldestDate();
         const newestDate = this.loadNewestDate();
@@ -296,9 +306,11 @@ const TimeService = {
 
         return this.calculateWorktimeForTimeRange(oldestDate, newestDate);
     },
+
     saveWorkStart(workstartEntry: Entry) {
         localStorage.setItem(STORAGE_KEY_CURRENT_WORKSTART,STORAGE_KEY_ENTRY + dateToDateForSaving(workstartEntry.start));
     },
+
     isWorkStartActive(): boolean {
         const currentWorkStartKey: string | null = localStorage.getItem(STORAGE_KEY_CURRENT_WORKSTART);
         
@@ -319,6 +331,7 @@ const TimeService = {
 
         return true;
     },
+
     loadActiveWorkEntry(): Entry | null {
         const currentWorkStartKey: string | null = localStorage.getItem(STORAGE_KEY_CURRENT_WORKSTART);
         
@@ -328,6 +341,7 @@ const TimeService = {
 
         return this.loadEntryFromJson(localStorage.getItem(currentWorkStartKey));
     },
+
     stopWork() {
         const currentWorkStartKey: string | null = localStorage.getItem(STORAGE_KEY_CURRENT_WORKSTART);
         localStorage.removeItem(STORAGE_KEY_CURRENT_WORKSTART);
@@ -344,7 +358,29 @@ const TimeService = {
 
        workstartEntry.end = new Date();
        this.saveEntryForDate(workstartEntry.start, this.calculateEntry(workstartEntry));
-    }
+    },
+
+    countEntriesForTypeInTimeRange(type: EntryType, start: Date, end: Date): number
+    {
+        //Clear time
+        start.setHours(0,0,0,0);
+        end.setHours(0,0,0,0);
+
+        let entryCount = 0;
+        for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+            const entry: Entry | null = this.loadEntryForDate(date);
+            if (entry != null && entry.type === type) {
+                entryCount++;
+            }
+        }
+        return entryCount;
+    },
+    calculateIllDaysForTimeRange(start: Date, end: Date): number {
+        return this.countEntriesForTypeInTimeRange(EntryType.ILL, start, end);
+    },
+    calculateVacationDaysForTimeRange(start: Date, end: Date): number {
+        return this.countEntriesForTypeInTimeRange(EntryType.VACATION, start, end);
+    },
 
 }
 
