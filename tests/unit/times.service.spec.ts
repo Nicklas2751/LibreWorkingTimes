@@ -1284,6 +1284,204 @@ describe('times.service.ts', () => {
         //THEN
         expect(vacationDayCount).toEqual(2);
 
+    }),
+
+    it('saveEntryForDate - save ill entry multiple days - multiple entries for ill', () => {
+
+        //GIVEN
+        localStorage.clear();
+        const entry: Entry = {
+            type: EntryType.ILL,
+            start: new Date(2021, 0, 1, 10, 0),
+            end: new Date(2021, 0, 10, 19, 0),
+            fullDay: false
+        };
+
+        //WHEN
+        TimeService.saveEntryForDate(new Date(2021,0,1),entry);
+        
+        //THEN
+        const awaitedEntries: Entry[] = [
+            {
+                type: EntryType.ILL,
+                fullDay: true,
+                start: new Date(2021, 0, 1),
+                end: new Date(2021, 0, 1),
+                worktime: { hours: 8, minutes: 0, isNegative: false},
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.ILL,
+                fullDay: true,
+                start: new Date(2021, 0, 2),
+                end: new Date(2021, 0, 2),
+                worktime: { hours: 8, minutes: 0, isNegative: false},
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.ILL,
+                fullDay: true,
+                start: new Date(2021, 0, 3),
+                end: new Date(2021, 0, 3),
+                worktime: { hours: 8, minutes: 0, isNegative: false},
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.ILL,
+                fullDay: true,
+                start: new Date(2021, 0, 4),
+                end: new Date(2021, 0, 4),
+                worktime: { hours: 8, minutes: 0, isNegative: false},
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.ILL,
+                fullDay: true,
+                start: new Date(2021, 0, 5),
+                end: new Date(2021, 0, 5),
+                worktime: { hours: 8, minutes: 0, isNegative: false},
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.ILL,
+                fullDay: true,
+                start: new Date(2021, 0, 6),
+                end: new Date(2021, 0, 6),
+                worktime: { hours: 8, minutes: 0, isNegative: false},
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.ILL,
+                fullDay: true,
+                start: new Date(2021, 0, 7),
+                end: new Date(2021, 0, 7),
+                worktime: { hours: 8, minutes: 0, isNegative: false},
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.ILL,
+                fullDay: true,
+                start: new Date(2021, 0, 8),
+                end: new Date(2021, 0, 8),
+                worktime: { hours: 8, minutes: 0, isNegative: false},
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.ILL,
+                fullDay: true,
+                start: new Date(2021, 0, 9),
+                end: new Date(2021, 0, 9),
+                worktime: { hours: 8, minutes: 0, isNegative: false},
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.ILL,
+                fullDay: true,
+                start: new Date(2021, 0, 10),
+                end: new Date(2021, 0, 10),
+                worktime: { hours: 8, minutes: 0, isNegative: false},
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            }
+        ];
+
+        for(let i: number = 0; i < 10; i++)
+        {
+            expect(localStorage.getItem(times.STORAGE_KEY_ENTRY + "01/"+(i+1 < 10 ? "0" : "" )+(i+1)+"/2021")).toMatch(JSON.stringify(awaitedEntries[i]));
+        }
+    }),
+
+    it('saveEntryForDate - save vacation entry multiple days - multiple entries for vacation', () => {
+
+        //GIVEN
+        localStorage.clear();
+        const entry: Entry = {
+            type: EntryType.VACATION,
+            start: new Date(2021, 0, 1, 10, 0),
+            end: new Date(2021, 0, 10, 19, 0),
+            fullDay: false
+        };
+
+        //WHEN
+        TimeService.saveEntryForDate(new Date(2021,0,1),entry);
+        
+        //THEN
+        const awaitedEntries: Entry[] = [
+            {
+                type: EntryType.VACATION,
+                fullDay: true,
+                start: new Date(2021, 0, 1),
+                end: new Date(2021, 0, 1),
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.VACATION,
+                fullDay: true,
+                start: new Date(2021, 0, 2),
+                end: new Date(2021, 0, 2),
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.VACATION,
+                fullDay: true,
+                start: new Date(2021, 0, 3),
+                end: new Date(2021, 0, 3),
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.VACATION,
+                fullDay: true,
+                start: new Date(2021, 0, 4),
+                end: new Date(2021, 0, 4),
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.VACATION,
+                fullDay: true,
+                start: new Date(2021, 0, 5),
+                end: new Date(2021, 0, 5),
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.VACATION,
+                fullDay: true,
+                start: new Date(2021, 0, 6),
+                end: new Date(2021, 0, 6),
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.VACATION,
+                fullDay: true,
+                start: new Date(2021, 0, 7),
+                end: new Date(2021, 0, 7),
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.VACATION,
+                fullDay: true,
+                start: new Date(2021, 0, 8),
+                end: new Date(2021, 0, 8),
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.VACATION,
+                fullDay: true,
+                start: new Date(2021, 0, 9),
+                end: new Date(2021, 0, 9),
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            },
+            {
+                type: EntryType.VACATION,
+                fullDay: true,
+                start: new Date(2021, 0, 10),
+                end: new Date(2021, 0, 10),
+                overtime: { hours: 0, minutes: 0, isNegative: false}
+            }
+        ];
+
+        for(let i: number = 0; i < 10; i++)
+        {
+            expect(localStorage.getItem(times.STORAGE_KEY_ENTRY + "01/"+(i+1 < 10 ? "0" : "" )+(i+1)+"/2021")).toMatch(JSON.stringify(awaitedEntries[i]));
+        }
     })
     
 })

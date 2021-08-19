@@ -437,6 +437,21 @@ export default defineComponent({
 
       (this.$refs.entryList as typeof IonList).$el.closeSlidingItems();
     },
+    updateTimeRange(start: Date, end: Date)
+    {
+      for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+        const foundMonth = this.months.find(month => month.monthNumber === date.getMonth());
+        if(foundMonth)
+        {
+          const foundDay = foundMonth.days.find(day => day.date.toDateString() == date.toDateString());       
+          const loadedEntry = TimeService.loadEntryForDate(date);
+          if(foundDay && loadedEntry != null)
+          {
+            foundDay.entry = loadedEntry;
+          }
+        }
+      }
+    },
     async openAddEditModal(day: Day) {
       const addEditModal = await modalController.create({
         id: "times-new-entry-"+createItemSelectorTextForDate(day.date),
@@ -451,6 +466,12 @@ export default defineComponent({
               day.entry.overtime = entry.overtime;
             }
             day.entry = entry;
+
+            if(entry.end && entry.start.toDateString() !== entry.end.toDateString())
+            {
+
+              this.updateTimeRange(entry.start, entry.end);
+            }
 
             this.loadStatistics();
           },

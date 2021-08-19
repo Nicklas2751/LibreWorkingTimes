@@ -102,7 +102,36 @@ const TimeService = {
         return null;
     },
 
+    generateEntriesForDays(entry: Entry)
+    {
+        for (let date = new Date(entry.start); date <= entry.end!; date.setDate(date.getDate() + 1)) {
+            //Clear time
+            date.setHours(0, 0, 0, 0);
+
+            const generatedEntry: Entry = {
+                type: entry.type,
+                fullDay: true,
+                start: date,
+                end: date,
+            };
+            this.calculateEntry(generatedEntry);
+            this.saveEntryForDate(date, generatedEntry);
+        }
+    },
+
     saveEntryForDate(date: Date, entry: Entry) {
+        //Vacation and Ill entries which end is on an other day should be converted to multiple entries instead
+        //This is needed to view it correctly on the overview and to count it right for the evaluation
+        if((EntryType.VACATION === entry.type || 
+            EntryType.ILL === entry.type) && 
+            entry.end && 
+            entry.start.toDateString() !== entry.end.toDateString()
+        )
+        {
+            this.generateEntriesForDays(entry);
+            return;
+        }
+
         localStorage.setItem(STORAGE_KEY_ENTRY + dateToDateForSaving(date), JSON.stringify(entry));
 
         //Update oldest entry
