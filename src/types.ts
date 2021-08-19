@@ -50,3 +50,33 @@ export class Duration {
 export enum OvertimeMode {
     ADD, REMOVE
 }
+
+export interface WorkDay {
+    name: string;
+    day: number;
+}
+
+export class WorkDayImpl implements WorkDay {
+    private _name: string;
+    private _day: number;
+
+    constructor(name: string, day: number)
+    {
+        this._name = name;
+        this._day = day;
+    }
+
+    public get name() {
+        return this._name;
+    }
+
+    public get day() {
+        return this._day;
+    }
+
+    public toString(): string {
+        return this._name;
+    }
+}
+
+export const WORK_DAYS: WorkDay[] = [ new WorkDayImpl("Montag", 1),  new WorkDayImpl("Dienstag", 2),  new WorkDayImpl("Mittwoch", 3),  new WorkDayImpl("Donnerstag", 4),  new WorkDayImpl("Freitag", 5),  new WorkDayImpl("Samstag", 6),  new WorkDayImpl("Sonntag", 0)];

@@ -1,6 +1,6 @@
 import TimeService from "../../src/servies/times.service"
 import * as times from "../../src/servies/times.service"
-import { Duration, Entry, EntryType } from "../../src/types"
+import { Duration, Entry, EntryType, WorkDay } from "../../src/types"
 
 describe('times.service.ts', () => {
     it('calculate positive work entry worktime minutes', () => {
@@ -1307,87 +1307,61 @@ describe('times.service.ts', () => {
                 fullDay: true,
                 start: new Date(2021, 0, 1),
                 end: new Date(2021, 0, 1),
-                worktime: { hours: 8, minutes: 0, isNegative: false},
-                overtime: { hours: 0, minutes: 0, isNegative: false}
-            },
-            {
-                type: EntryType.ILL,
-                fullDay: true,
-                start: new Date(2021, 0, 2),
-                end: new Date(2021, 0, 2),
-                worktime: { hours: 8, minutes: 0, isNegative: false},
-                overtime: { hours: 0, minutes: 0, isNegative: false}
-            },
-            {
-                type: EntryType.ILL,
-                fullDay: true,
-                start: new Date(2021, 0, 3),
-                end: new Date(2021, 0, 3),
-                worktime: { hours: 8, minutes: 0, isNegative: false},
-                overtime: { hours: 0, minutes: 0, isNegative: false}
+                worktime: new Duration(8, 0, false),
+                overtime: new Duration(0, 0, false)
             },
             {
                 type: EntryType.ILL,
                 fullDay: true,
                 start: new Date(2021, 0, 4),
                 end: new Date(2021, 0, 4),
-                worktime: { hours: 8, minutes: 0, isNegative: false},
-                overtime: { hours: 0, minutes: 0, isNegative: false}
+                worktime: new Duration(8, 0, false),
+                overtime: new Duration(0, 0, false)
             },
             {
                 type: EntryType.ILL,
                 fullDay: true,
                 start: new Date(2021, 0, 5),
                 end: new Date(2021, 0, 5),
-                worktime: { hours: 8, minutes: 0, isNegative: false},
-                overtime: { hours: 0, minutes: 0, isNegative: false}
+                worktime: new Duration(8, 0, false),
+                overtime: new Duration(0, 0, false)
             },
             {
                 type: EntryType.ILL,
                 fullDay: true,
                 start: new Date(2021, 0, 6),
                 end: new Date(2021, 0, 6),
-                worktime: { hours: 8, minutes: 0, isNegative: false},
-                overtime: { hours: 0, minutes: 0, isNegative: false}
+                worktime: new Duration(8, 0, false),
+                overtime: new Duration(0, 0, false)
             },
             {
                 type: EntryType.ILL,
                 fullDay: true,
                 start: new Date(2021, 0, 7),
                 end: new Date(2021, 0, 7),
-                worktime: { hours: 8, minutes: 0, isNegative: false},
-                overtime: { hours: 0, minutes: 0, isNegative: false}
+                worktime: new Duration(8, 0, false),
+                overtime: new Duration(0, 0, false)
             },
             {
                 type: EntryType.ILL,
                 fullDay: true,
                 start: new Date(2021, 0, 8),
                 end: new Date(2021, 0, 8),
-                worktime: { hours: 8, minutes: 0, isNegative: false},
-                overtime: { hours: 0, minutes: 0, isNegative: false}
-            },
-            {
-                type: EntryType.ILL,
-                fullDay: true,
-                start: new Date(2021, 0, 9),
-                end: new Date(2021, 0, 9),
-                worktime: { hours: 8, minutes: 0, isNegative: false},
-                overtime: { hours: 0, minutes: 0, isNegative: false}
-            },
-            {
-                type: EntryType.ILL,
-                fullDay: true,
-                start: new Date(2021, 0, 10),
-                end: new Date(2021, 0, 10),
-                worktime: { hours: 8, minutes: 0, isNegative: false},
-                overtime: { hours: 0, minutes: 0, isNegative: false}
+                worktime: new Duration(8, 0, false),
+                overtime: new Duration(0, 0, false)
             }
         ];
 
+        const foundEntries: Entry[] = [];
         for(let i: number = 0; i < 10; i++)
         {
-            expect(localStorage.getItem(times.STORAGE_KEY_ENTRY + "01/"+(i+1 < 10 ? "0" : "" )+(i+1)+"/2021")).toMatch(JSON.stringify(awaitedEntries[i]));
+            const foundEntry: Entry | null = TimeService.loadEntryFromJson(localStorage.getItem(times.STORAGE_KEY_ENTRY + "01/"+(i+1 < 10 ? "0" : "" )+(i+1)+"/2021"));
+            if(foundEntry != null)
+            {
+                foundEntries.push(foundEntry);
+            }
         }
+        expect(foundEntries).toEqual(awaitedEntries);
     }),
 
     it('saveEntryForDate - save vacation entry multiple days - multiple entries for vacation', () => {
@@ -1411,77 +1385,55 @@ describe('times.service.ts', () => {
                 fullDay: true,
                 start: new Date(2021, 0, 1),
                 end: new Date(2021, 0, 1),
-                overtime: { hours: 0, minutes: 0, isNegative: false}
-            },
-            {
-                type: EntryType.VACATION,
-                fullDay: true,
-                start: new Date(2021, 0, 2),
-                end: new Date(2021, 0, 2),
-                overtime: { hours: 0, minutes: 0, isNegative: false}
-            },
-            {
-                type: EntryType.VACATION,
-                fullDay: true,
-                start: new Date(2021, 0, 3),
-                end: new Date(2021, 0, 3),
-                overtime: { hours: 0, minutes: 0, isNegative: false}
+                overtime: new Duration(0, 0, false)
             },
             {
                 type: EntryType.VACATION,
                 fullDay: true,
                 start: new Date(2021, 0, 4),
                 end: new Date(2021, 0, 4),
-                overtime: { hours: 0, minutes: 0, isNegative: false}
+                overtime: new Duration(0, 0, false)
             },
             {
                 type: EntryType.VACATION,
                 fullDay: true,
                 start: new Date(2021, 0, 5),
                 end: new Date(2021, 0, 5),
-                overtime: { hours: 0, minutes: 0, isNegative: false}
+                overtime: new Duration(0, 0, false)
             },
             {
                 type: EntryType.VACATION,
                 fullDay: true,
                 start: new Date(2021, 0, 6),
                 end: new Date(2021, 0, 6),
-                overtime: { hours: 0, minutes: 0, isNegative: false}
+                overtime: new Duration(0, 0, false)
             },
             {
                 type: EntryType.VACATION,
                 fullDay: true,
                 start: new Date(2021, 0, 7),
                 end: new Date(2021, 0, 7),
-                overtime: { hours: 0, minutes: 0, isNegative: false}
+                overtime: new Duration(0, 0, false)
             },
             {
                 type: EntryType.VACATION,
                 fullDay: true,
                 start: new Date(2021, 0, 8),
                 end: new Date(2021, 0, 8),
-                overtime: { hours: 0, minutes: 0, isNegative: false}
-            },
-            {
-                type: EntryType.VACATION,
-                fullDay: true,
-                start: new Date(2021, 0, 9),
-                end: new Date(2021, 0, 9),
-                overtime: { hours: 0, minutes: 0, isNegative: false}
-            },
-            {
-                type: EntryType.VACATION,
-                fullDay: true,
-                start: new Date(2021, 0, 10),
-                end: new Date(2021, 0, 10),
-                overtime: { hours: 0, minutes: 0, isNegative: false}
+                overtime: new Duration(0, 0, false)
             }
         ];
 
+        const foundEntries: Entry[] = [];
         for(let i: number = 0; i < 10; i++)
         {
-            expect(localStorage.getItem(times.STORAGE_KEY_ENTRY + "01/"+(i+1 < 10 ? "0" : "" )+(i+1)+"/2021")).toMatch(JSON.stringify(awaitedEntries[i]));
+            const foundEntry: Entry | null = TimeService.loadEntryFromJson(localStorage.getItem(times.STORAGE_KEY_ENTRY + "01/"+(i+1 < 10 ? "0" : "" )+(i+1)+"/2021"));
+            if(foundEntry != null)
+            {
+                foundEntries.push(foundEntry);
+            }
         }
+        expect(foundEntries).toEqual(awaitedEntries);
     })
     
 })

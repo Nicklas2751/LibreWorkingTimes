@@ -105,17 +105,21 @@ const TimeService = {
     generateEntriesForDays(entry: Entry)
     {
         for (let date = new Date(entry.start); date <= entry.end!; date.setDate(date.getDate() + 1)) {
-            //Clear time
-            date.setHours(0, 0, 0, 0);
+            const workDaysDays: number[] = SettingsService.workdays.value.map(workDay => workDay.day);
+            if(workDaysDays.includes(date.getDay()))
+            {
+                //Clear time
+                date.setHours(0, 0, 0, 0);
 
-            const generatedEntry: Entry = {
-                type: entry.type,
-                fullDay: true,
-                start: date,
-                end: date,
-            };
-            this.calculateEntry(generatedEntry);
-            this.saveEntryForDate(date, generatedEntry);
+                const generatedEntry: Entry = {
+                    type: entry.type,
+                    fullDay: true,
+                    start: date,
+                    end: date,
+                };
+                this.calculateEntry(generatedEntry);
+                this.saveEntryForDate(date, generatedEntry);
+            }
         }
     },
 

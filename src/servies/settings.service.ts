@@ -1,4 +1,4 @@
-import { Duration } from "../types";
+import { Duration, WorkDay, WORK_DAYS } from "../types";
 import { Ref, ref } from 'vue'
 const STORAGE_KEY_WORKTIME = "Settings.WorkTime";
 const STORAGE_KEY_BREAKTIME = "Settings.BreakTime";
@@ -6,15 +6,15 @@ const STORAGE_KEY_DESCRIPTION = "Settings.Description";
 const STORAGE_KEY_WORKDAYS = "Settings.WorkDays";
 
 
-class SettingsServiceClass {
+export class SettingsServiceClass {
     private _description: Ref<string>;
-    private _workdays: Ref<string[]>;
+    private _workdays: Ref<WorkDay[]>;
     private _worktime: Ref<Duration>;
     private _breaktime: Ref<Duration>;
 
     constructor() {
         this._description = ref(this.loadConfigProperty<string>(STORAGE_KEY_DESCRIPTION, "John Doe @ Example Corp"));
-        this._workdays = ref(this.loadConfigProperty<string[]>(STORAGE_KEY_WORKDAYS, ['montag', 'dienstag', 'mittwoch', 'donnerstag', 'freitag']));
+        this._workdays = ref(this.loadConfigProperty<WorkDay[]>(STORAGE_KEY_WORKDAYS, [WORK_DAYS[0],WORK_DAYS[1],WORK_DAYS[2],WORK_DAYS[3],WORK_DAYS[4]]));
         this._worktime = ref(this.loadConfigProperty<Duration>(STORAGE_KEY_WORKTIME, new Duration(8, 0)));
         this._breaktime = ref(this.loadConfigProperty<Duration>(STORAGE_KEY_BREAKTIME, new Duration(0, 30)));
     }
@@ -38,12 +38,12 @@ class SettingsServiceClass {
         return this._description;
     }
 
-    public setWorkDays(workdays: string[]) {
+    public setWorkDays(workdays: WorkDay[]) {
         this.saveConfigProperty(STORAGE_KEY_WORKDAYS, workdays);
         this._workdays.value = workdays;
     }
 
-    public get workdays(): Ref<string[]> {
+    public get workdays(): Ref<WorkDay[]> {
         return this._workdays;
     }
 
