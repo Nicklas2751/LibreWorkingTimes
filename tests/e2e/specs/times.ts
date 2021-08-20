@@ -29,7 +29,7 @@ describe("Times overview", () => {
 
   it("Complete overtime zero", () => {
     cy.get("#complete-overtime")
-    .contains("Überstunden: 0:00");
+    .contains("Overtime: 0:00");
   }),
 
   it("Today stats zero", () => {
@@ -137,7 +137,7 @@ describe("Times overview", () => {
 
     //THEN
     cy.get("#times-item-"+dayString+" #times-item-stats").should("have.text","0:00-8:00");
-    cy.get("#complete-overtime").should("have.text","Überstunden: -8:00");
+    cy.get("#complete-overtime").should("have.text","Overtime: -8:00");
   }),
 
   it("Add overtime adding entry with dialog", () => {
@@ -171,7 +171,7 @@ describe("Times overview", () => {
 
     //THEN
     cy.get("#times-item-"+dayString+" #times-item-stats").should("have.text","0:002:00");
-    cy.get("#complete-overtime").should("have.text","Überstunden: -6:00");
+    cy.get("#complete-overtime").should("have.text","Overtime: -6:00");
   })
   //cy.get("#today-stats").should("have.text","8:000:00")
 })
