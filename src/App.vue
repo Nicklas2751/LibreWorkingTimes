@@ -4,13 +4,13 @@
       <ion-menu content-id="main-content" type="overlay">
         <ion-content>
           <ion-list id="inbox-list">
-            <ion-list-header>Arbeitszeiten</ion-list-header>
+            <ion-list-header>{{ $t("appTitle") }}</ion-list-header>
             <ion-note>{{ description }}</ion-note>
   
             <ion-menu-toggle auto-hide="false" v-for="(p, i) in appPages" :key="i">
               <ion-item router-direction="root" :router-link="p.url" lines="none" detail="false" class="hydrated" :class="{ selected: selectedIndex() === i }">
                 <ion-icon slot="start" :ios="p.iosIcon" :md="p.mdIcon"></ion-icon>
-                <ion-label>{{ p.title }}</ion-label>
+                <ion-label>{{ $t(p.title) }}</ion-label>
               </ion-item>
             </ion-menu-toggle>
           </ion-list>
@@ -20,7 +20,6 @@
     </IonSplitPane>
   </IonApp>
 </template>
-
 <script lang="ts">
 import { IonApp, IonContent, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonMenu, IonMenuToggle, IonNote, IonRouterOutlet, IonSplitPane } from '@ionic/vue';
 import { defineComponent } from 'vue';
@@ -63,19 +62,19 @@ export default defineComponent({
   setup() {
     const appPages = [
       {
-        title: 'Zeiten',
+        title: "pages.times",
         url: '/times',
         iosIcon: calendarNumberOutline,
         mdIcon: calendarOutline,
       },
       {
-        title: 'Auswertung',
+        title: 'pages.evaluation',
         url: '/evaluation',
         iosIcon: pieChartOutline,
         mdIcon: pieChart
       },
       {
-        title: 'Einstellungen',
+        title: 'pages.settings',
         url: '/settings',
         iosIcon: settingsOutline,
         mdIcon: settings

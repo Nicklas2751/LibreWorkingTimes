@@ -13,7 +13,7 @@
           <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Überstunden aktuelle Woche</ion-card-title>
+                <ion-card-title>{{ $t("evaluation.overtimeCurrentWeek") }}</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
@@ -24,7 +24,7 @@
           <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Arbeitszeit aktuelle Woche</ion-card-title>
+                <ion-card-title>{{ $t("evaluation.worktimeCurrentWeek") }}</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
@@ -37,7 +37,7 @@
           <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Arbeitszeit aktueller Monat</ion-card-title>
+                <ion-card-title>{{ $t("evaluation.overtimeCurrentMonth") }}</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
@@ -48,7 +48,7 @@
           <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Überstunden aktueller Monat</ion-card-title>
+                <ion-card-title>{{ $t("evaluation.worktimeCurrentMonth") }}</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
@@ -59,7 +59,7 @@
           <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Krankheitstage aktueller Monat</ion-card-title>
+                <ion-card-title>{{ $t("evaluation.illDaysCurrentMonth") }}</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
@@ -70,7 +70,7 @@
           <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Urlaubstage aktueller Monat</ion-card-title>
+                <ion-card-title>{{ $t("evaluation.vacationDaysCurrentMonth") }}</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
@@ -83,7 +83,7 @@
           <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Krankheitstage aktuelles Jahr</ion-card-title>
+                <ion-card-title>{{ $t("evaluation.illDaysCurrentYear") }}</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
@@ -94,7 +94,7 @@
           <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Urlaubstage aktuelles Jahr</ion-card-title>
+                <ion-card-title>{{ $t("evaluation.vacationDaysCurrentYear") }}</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
@@ -107,7 +107,7 @@
           <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Arbeitszeit Insgesamt</ion-card-title>
+                <ion-card-title>{{ $t("evaluation.worktimeComplete") }}</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
@@ -118,7 +118,7 @@
                     <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Überstunden Insgesamt</ion-card-title>
+                <ion-card-title>{{ $t("evaluation.overtimeComplete") }}</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
@@ -131,14 +131,14 @@
           <ion-col size="12" size-md="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>Arbeitszeiten und Überstunden Entwicklung</ion-card-title>
+                <ion-card-title>{{ $t("evaluation.workingHoursAndOvertimeDevelopment") }}</ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
                 <LineChart :chartData="chartData" :options="chartOptions" /><br/>
-                <b>Durchschnitt:</b><br/>
-                Arbeitszeit: {{ calcAverageWorktime() }} Stunden im Monat <br/>
-                Überstunden: {{ calcAverageOvertime() }} Stunden im Monat
+                <b>{{ $t("evaluation.average") }}:</b><br/>
+                {{ $t("evaluation.averageWorktimeHoursPerMonth",{averageWorktime: calcAverageWorktime()}) }} <br/>
+                {{ $t("evaluation.averageOvertimeHoursPerMonth",{averageOvertime: calcAverageOvertime()}) }}
               </ion-card-content>
             </ion-card>
           </ion-col>
@@ -288,8 +288,70 @@ function endOfYear(): Date
   return yearEnd;
 }
 
+Chart.register(...registerables);
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+let chartOptions: any;
+
+if(prefersDark.matches)
+{
+  chartOptions = ref<ChartOptions<'line'>>({
+    responsive: true,
+    color: 'rgba(255, 255, 255, 1)',
+    plugins: {
+      legend: {
+        position: 'top'
+      }
+    },
+    scales: {
+      x: {
+        grid: {
+          color: 'rgba(255, 255, 255, 0.3)'
+        },
+        ticks: {
+          color: 'rgba(255, 255, 255, 0.8)',
+        }
+      },
+      y: {
+        grid: {
+          color: 'rgba(255, 255, 255, 0.3)'
+        },
+        ticks: {
+          color: 'rgba(255, 255, 255, 0.8)',
+        }
+      }
+    }
+  });
+} else {
+  chartOptions = ref<ChartOptions<'line'>>({
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top'
+      }
+    }
+  });
+}
+
+const chartData = {
+  labels: createLabelsForLastSixMonthsIncludingCurrent(),
+  datasets: [
+    {
+      label: "Arbeitszeiten",
+      data: loadWorktimesForLastSixMonthsIncludingCurrent(),
+      backgroundColor: '#36a2eb',
+      borderColor: '#36a2eb',
+    },
+    {
+      label: 'Überstunden',
+      data: loadOvertimesForLastSixMonthsIncludingCurrent(),
+      backgroundColor: '#ff6384',
+      borderColor: '#ff6384',
+    }
+  ],
+};
+
 export default defineComponent({
-  name: "Auswertung",
   components: {
     IonPage,
     IonContent,
@@ -307,70 +369,14 @@ export default defineComponent({
     LineChart,
   },
   setup() {
-    Chart.register(...registerables);
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-
-    let chartOptions: any;
     
-    if(prefersDark.matches)
-    {
-      chartOptions = ref<ChartOptions<'line'>>({
-        responsive: true,
-        color: 'rgba(255, 255, 255, 1)',
-        plugins: {
-          legend: {
-            position: 'top'
-          }
-        },
-        scales: {
-          x: {
-            grid: {
-              color: 'rgba(255, 255, 255, 0.3)'
-            },
-            ticks: {
-              color: 'rgba(255, 255, 255, 0.8)',
-            }
-          },
-          y: {
-            grid: {
-              color: 'rgba(255, 255, 255, 0.3)'
-            },
-            ticks: {
-              color: 'rgba(255, 255, 255, 0.8)',
-            }
-          }
-        }
-      });
-    } else {
-      chartOptions = ref<ChartOptions<'line'>>({
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'top'
-          }
-        }
-      });
-    }
-    
-    const chartData = {
-      labels: createLabelsForLastSixMonthsIncludingCurrent(),
-      datasets: [
-        {
-          label: 'Arbeitszeiten',
-          data: loadWorktimesForLastSixMonthsIncludingCurrent(),
-          backgroundColor: '#36a2eb',
-          borderColor: '#36a2eb',
-        },
-        {
-          label: 'Überstunden',
-          data: loadOvertimesForLastSixMonthsIncludingCurrent(),
-          backgroundColor: '#ff6384',
-          borderColor: '#ff6384',
-        }
-      ],
-    };
 
   return { chartData, chartOptions };
+  },
+  data() {
+    chartData.datasets[0].label = this.$t("evaluation.workingtime");
+    chartData.datasets[1].label = this.$t("evaluation.overtime");
+    return {}
   },
   methods: {
     formatDuration(duration: Duration | undefined): string {

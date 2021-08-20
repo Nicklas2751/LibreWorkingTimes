@@ -9,21 +9,21 @@
     </ion-header>
     <ion-content>
       <ion-item>
-        <ion-label position="floating">Bezeichnung</ion-label>
+        <ion-label position="floating">{{ $t("settings.description") }}</ion-label>
         <ion-input id="settings-description" v-model="description" required></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label position="floating">Tägliche Arbeitszeit</ion-label>
+        <ion-label position="floating">{{ $t("settings.dailyWorktime") }}</ion-label>
         <ion-datetime id="settings-dailyWorktime" display-format="HH:mm" picker-format="HH:mm" v-model="workTime"></ion-datetime>
       </ion-item>
       <ion-item>
-        <ion-label position="floating">Typische Pausendauer</ion-label>
+        <ion-label position="floating">{{ $t("settings.breakTime") }}</ion-label>
         <ion-datetime id="settings-breakTime" display-format="HH:mm" picker-format="HH:mm" v-model="breakTime"></ion-datetime>
       </ion-item>
       <ion-item>
-        <ion-label position="floating">Arbeitstage</ion-label>
-        <ion-select id="settings-worktimes" multiple="true" cancel-text="Abbrechen" ok-text="Ok"  v-model="workDays" required>
-          <ion-select-option v-bind:key="workDay.day" v-for="workDay in allWorkDays" :value="workDay">{{ workDay.name }}</ion-select-option>
+        <ion-label position="floating">{{ $t("settings.worktimes") }}</ion-label>
+        <ion-select id="settings-worktimes" multiple="true" v-bind:cancel-text="$t('settings.cancel')" v-bind:ok-text="$t('settings.ok')"  v-model="workDays" required>
+          <ion-select-option v-bind:key="workDay.day" v-for="workDay in allWorkDays" :value="workDay">{{ $t("settings.days." + workDay.name) }}</ion-select-option>
       </ion-select>
       </ion-item>
     </ion-content>
@@ -58,7 +58,6 @@ function fakeDateToDuration(date: Date): Duration {
 }
 
 export default defineComponent({
-  name: "Einstellungen",
   components: {
     IonPage,
     IonContent,

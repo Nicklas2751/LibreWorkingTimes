@@ -79,4 +79,4 @@ export class WorkDayImpl implements WorkDay {
     }
 }
 
-export const WORK_DAYS: WorkDay[] = [ new WorkDayImpl("Montag", 1),  new WorkDayImpl("Dienstag", 2),  new WorkDayImpl("Mittwoch", 3),  new WorkDayImpl("Donnerstag", 4),  new WorkDayImpl("Freitag", 5),  new WorkDayImpl("Samstag", 6),  new WorkDayImpl("Sonntag", 0)];
+export const WORK_DAYS: WorkDay[] = [ new WorkDayImpl("monday", 1),  new WorkDayImpl("tuesday", 2),  new WorkDayImpl("wednesday", 3),  new WorkDayImpl("thursday", 4),  new WorkDayImpl("friday", 5),  new WorkDayImpl("saturday", 6),  new WorkDayImpl("sunday", 0)];

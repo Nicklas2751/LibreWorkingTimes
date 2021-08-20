@@ -2,35 +2,35 @@
   <ion-header>
     <ion-toolbar>
       <ion-buttons slot="start">
-        <ion-button id="times-new-entry-abort" @click="dismiss()"> Abort </ion-button>
+        <ion-button id="times-new-entry-abort" @click="dismiss()">{{ $t("abort") }}</ion-button>
       </ion-buttons>
 
       <ion-title>{{ title }}</ion-title>
 
       <ion-buttons slot="end">
-        <ion-button id="times-new-entry-save" @click="save()"> Save </ion-button>
+        <ion-button id="times-new-entry-save" @click="save()">{{ $t("save") }}</ion-button>
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
   <ion-content class="ion-padding">
     <ion-list>
       <ion-item>
-        <ion-label>Type</ion-label>
+        <ion-label>{{ $t("times.modal.type") }}</ion-label>
         <ion-select id="times-new-entry-type-select" v-model="entry.type">
-          <ion-select-option id="times-new-entry-type-select-option-work" :value="EntryType.WORK">Work</ion-select-option>
+          <ion-select-option id="times-new-entry-type-select-option-work" :value="EntryType.WORK">{{ $t("times.modal.types.work") }}</ion-select-option>
           <ion-select-option  id="times-new-entry-type-select-option-overtime" :value="EntryType.OVERTIME"
-            >Overtime</ion-select-option
+            >{{ $t("times.modal.types.overtime") }}</ion-select-option
           >
           <ion-select-option id="times-new-entry-type-select-option-vacation" :value="EntryType.VACATION"
-            >Vacation</ion-select-option
+            >{{ $t("times.modal.types.vacation") }}</ion-select-option
           >
-          <ion-select-option id="times-new-entry-type-select-option-illness" :value="EntryType.ILL">Illness</ion-select-option>
+          <ion-select-option id="times-new-entry-type-select-option-illness" :value="EntryType.ILL">{{ $t("times.modal.types.illness") }}</ion-select-option>
         </ion-select>
       </ion-item>
 
       <!-- Work -->
       <ion-item v-if="entry.type === EntryType.WORK">
-        <ion-label>Start Time</ion-label>
+        <ion-label>{{ $t("times.modal.startTime") }}</ion-label>
         <ion-datetime
           id="times-new-entry-work-start"
           display-format="DD.MM.YYYY HH:mm"
@@ -40,7 +40,7 @@
         ></ion-datetime>
       </ion-item>
       <ion-item v-if="entry.type === EntryType.WORK">
-        <ion-label>End Time</ion-label>
+        <ion-label>{{ $t("times.modal.endTime") }}</ion-label>
         <ion-datetime
           id="times-new-entry-work-end"
           display-format="DD.MM.YYYY HH:mm"
@@ -52,7 +52,7 @@
 
       <!-- Overtime -->
       <ion-item v-if="entry.type === EntryType.OVERTIME">
-        <ion-label>Day</ion-label>
+        <ion-label>{{ $t("times.modal.day") }}</ion-label>
         <ion-datetime
           id="times-new-entry-overtime-day"
           display-format="DD.MM.YYYY"
@@ -62,7 +62,7 @@
         ></ion-datetime>
       </ion-item>
       <ion-item v-if="entry.type === EntryType.OVERTIME && !entry.fullDay">
-        <ion-label>Overtime amount</ion-label>
+        <ion-label>{{ $t("times.modal.overtimeAmount") }}</ion-label>
 
         <ion-datetime
           id="times-new-entry-overtime-amount"
@@ -73,7 +73,7 @@
         ></ion-datetime>
       </ion-item>
       <ion-item v-if="entry.type === EntryType.OVERTIME">
-        <ion-label>Full day?</ion-label>
+        <ion-label>{{ $t("times.modal.fullDay") }}</ion-label>
         <ion-toggle
           v-model="entry.fullDay"
           @ionChange="updateOvertimeForFullDay"
@@ -82,10 +82,10 @@
       <ion-item v-if="entry.type === EntryType.OVERTIME">
         <ion-segment v-model="overtimeMode">
           <ion-segment-button :value="OvertimeMode.ADD">
-            <ion-label>Add</ion-label>
+            <ion-label>{{ $t("times.modal.add") }}</ion-label>
           </ion-segment-button>
           <ion-segment-button :value="OvertimeMode.REMOVE">
-            <ion-label>Remove</ion-label>
+            <ion-label>{{ $t("times.modal.remove") }}</ion-label>
           </ion-segment-button>
         </ion-segment>
       </ion-item>
@@ -94,7 +94,7 @@
       <ion-item
         v-if="entry.type === EntryType.VACATION || entry.type === EntryType.ILL"
       >
-        <ion-label>Start Time</ion-label>
+        <ion-label>{{ $t("times.modal.startTime") }}</ion-label>
         <ion-datetime
           display-format="DD.MM.YYYY"
           picker-format="DD.MM.YYYY"
@@ -105,7 +105,7 @@
       <ion-item
         v-if="entry.type === EntryType.VACATION || entry.type === EntryType.ILL"
       >
-        <ion-label>End Time</ion-label>
+        <ion-label>{{ $t("times.modal.endTime") }}</ion-label>
         <ion-datetime
           display-format="DD.MM.YYYY"
           picker-format="DD.MM.YYYY"
@@ -181,7 +181,6 @@ export default defineComponent({
   },
   data() {
     return {
-      content: "Content",
       entry: (undefined as unknown) as Entry,
       overtimeMode: OvertimeMode.ADD,
       EntryType,
@@ -359,8 +358,8 @@ export default defineComponent({
     title(): string {
       return this.day
         ? (this.day.entry && isSameDate(this.day.entry.start, this.entry.start)
-            ? "Edit"
-            : "Add") +
+            ? this.$t("times.modal.edit")
+            : this.$t("times.modal.add")) +
             " " +
             this.entry.start.toLocaleDateString(navigator.language)
         : "";

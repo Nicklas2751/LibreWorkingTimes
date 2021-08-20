@@ -12,10 +12,10 @@
               class="ion-align-self-center"
               size="6"
             >
-              <span class="bold">Überstunden:</span> {{ completeOvertime }}
+              <span class="bold">{{ $t("times.overtimeLabel") }}:</span> {{ completeOvertime }}
             </ion-col>
             <ion-col class="ion-align-self-center" size="3">
-              <span class="bold">Heute:</span>
+              <span class="bold">{{ $t("times.todayLabel") }}:</span>
             </ion-col>
             <ion-col id="today-stats" class="ion-align-self-center" size="3">
               {{ formatDuration(current.worktime) }}<br />
@@ -89,7 +89,7 @@
                 color="danger"
                 expandable
                 @click="deleteEntryForDay(day)"
-                >Delete</ion-item-option
+                >{{ $t("times.deleteButton") }}</ion-item-option
               >
             </ion-item-options>
           </ion-item-sliding>
@@ -103,7 +103,7 @@
       >
         <ion-infinite-scroll-content
           loading-spinner="bubbles"
-          loading-text="Loading more data..."
+          v-bind:loading-text="$t('times.loadingData')"
         >
         </ion-infinite-scroll-content>
       </ion-infinite-scroll>
@@ -160,11 +160,6 @@ function daysInMonth(month: number, year: number): number {
 
 function setupMockData() {
   const mockDataEntries: Entry[] = [
-    /*{
-      start: new Date(2021, 4, 1, 6, 0),
-      fullDay: false,
-      type: EntryType.WORK,
-    },*/
     {
       start: new Date(2021, 3, 26, 19, 0),
       end: new Date(2021, 3, 26, 20, 0),
@@ -242,7 +237,6 @@ function isSameDate(first: Date, second: Date) {
 }
 
 export default defineComponent({
-  name: "Zeiten",
   interval: 1000,
   months: [],
   monthModifier: 0,
@@ -273,7 +267,6 @@ export default defineComponent({
   },
   data() {
     return {
-      title: "Zeiten",
       months: [] as Month[],
       current: {} as Entry,
       completeOvertime: "",
@@ -513,10 +506,10 @@ export default defineComponent({
       }
 
       const quickActionsSheet = await actionSheetController.create({
-        header: "Quick actions",
+        header: this.$t("times.quickActions.header"),
         buttons: [
           {
-            text: TimeService.isWorkStartActive() ? "Stop work" : "Start work",
+            text: TimeService.isWorkStartActive() ? this.$t("times.quickActions.stopWork") : this.$t("times.quickActions.startWork"),
             icon: add,
             handler: () => {
               if(TimeService.isWorkStartActive())
@@ -538,7 +531,7 @@ export default defineComponent({
             },
           },
           {
-            text: "Create new entry",
+            text: this.$t("times.quickActions.newEntry"),
             icon: add,
             handler: () => {
               if (todayDayElement) {
@@ -547,7 +540,7 @@ export default defineComponent({
             },
           },
           {
-            text: "Cancel",
+            text: this.$t("cancel"),
             icon: close,
             role: "cancel",
           },
