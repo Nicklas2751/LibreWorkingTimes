@@ -35,15 +35,15 @@ to <nicklas+libreworkingtimes@wiegandt.eu>.
 
 > If you want to ask a question, we assume that you have read the available [Documentation](https://docs.libreworkingtimes.github.io).
 
-Before you ask a question, it is best to search for existing [Issues](https://github.com/Nicklas2751/LibreWorkingTimes/issues) that might help you. In case you have found a suitable issue and still need clarification, you can write your question in this issue. It is also advisable to search the internet for answers first.
+Before you ask a question, it is best to search for existing [Discussion](https://github.com/Nicklas2751/LibreWorkingTimes/discussions/categories/q-a) that might help you. In case you have found a suitable discussion and still need clarification, you can write your question in this discussion. It is also advisable to search the internet for answers first.
 
 If you then still feel the need to ask a question and need clarification, we recommend the following:
 
-- Open an [Issue](https://github.com/Nicklas2751/LibreWorkingTimes/issues/new) with the label `question`.
+- Open an [Discussion](https://github.com/Nicklas2751/LibreWorkingTimes/discussions/new) with the category `Q&A`.
 - Provide as much context as you can about what you're running into.
 - Provide project and platform versions (nodejs, npm, etc), depending on what seems relevant.
 
-We will then take care of the issue as soon as possible.
+We will then take care of the question as soon as possible.
 
 ## I Want To Contribute
 
