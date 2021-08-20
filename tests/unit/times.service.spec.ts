@@ -1,6 +1,6 @@
 import TimeService from "../../src/servies/times.service"
 import * as times from "../../src/servies/times.service"
-import { Duration, Entry, EntryType, WorkDay } from "../../src/types"
+import { Duration, Entry, EntryType } from "../../src/types"
 
 describe('times.service.ts', () => {
     it('calculate positive work entry worktime minutes', () => {
@@ -1353,7 +1353,7 @@ describe('times.service.ts', () => {
         ];
 
         const foundEntries: Entry[] = [];
-        for(let i: number = 0; i < 10; i++)
+        for(let i = 0; i < 10; i++)
         {
             const foundEntry: Entry | null = TimeService.loadEntryFromJson(localStorage.getItem(times.STORAGE_KEY_ENTRY + "01/"+(i+1 < 10 ? "0" : "" )+(i+1)+"/2021"));
             if(foundEntry != null)

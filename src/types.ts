@@ -66,11 +66,11 @@ export class WorkDayImpl implements WorkDay {
         this._day = day;
     }
 
-    public get name() {
+    public get name(): string {
         return this._name;
     }
 
-    public get day() {
+    public get day(): number {
         return this._day;
     }
 

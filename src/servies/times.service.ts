@@ -20,7 +20,7 @@ function calcDurationFromMinutes(completeMinutes: number): Duration {
 
 const dateForSavingOptions: Intl.DateTimeFormatOptions = { day: "2-digit", month: "2-digit", year: "numeric" };
 
-export function dateToDateForSaving(date: Date) {
+export function dateToDateForSaving(date: Date): string {
     return date.toLocaleDateString(navigator.language, dateForSavingOptions);
 }
 
@@ -102,9 +102,14 @@ const TimeService = {
         return null;
     },
 
-    generateEntriesForDays(entry: Entry)
+    generateEntriesForDays(entry: Entry): void
     {
-        for (let date = new Date(entry.start); date <= entry.end!; date.setDate(date.getDate() + 1)) {
+        if(!entry.end)
+        {
+            return;
+        }
+
+        for (let date = new Date(entry.start); date <= entry.end; date.setDate(date.getDate() + 1)) {
             const workDaysDays: number[] = SettingsService.workdays.value.map(workDay => workDay.day);
             if(workDaysDays.includes(date.getDay()))
             {
@@ -123,7 +128,7 @@ const TimeService = {
         }
     },
 
-    saveEntryForDate(date: Date, entry: Entry) {
+    saveEntryForDate(date: Date, entry: Entry): void {
         //Vacation and Ill entries which end is on an other day should be converted to multiple entries instead
         //This is needed to view it correctly on the overview and to count it right for the evaluation
         if((EntryType.VACATION === entry.type || 
@@ -159,7 +164,7 @@ const TimeService = {
         return parseDate(localStorage.getItem(STORAGE_KEY_NEWEST_DATE));
     },
 
-    deleteEntryForDate(date: Date) {
+    deleteEntryForDate(date: Date): void {
         localStorage.removeItem(STORAGE_KEY_ENTRY + dateToDateForSaving(date));
 
         const oldestDate: Date | null = this.loadOldestDate();
@@ -173,7 +178,7 @@ const TimeService = {
         }
     },
 
-    findNewOldestDate(oldestDateBefore: Date) {
+    findNewOldestDate(oldestDateBefore: Date): void {
 
         const newestDate: Date | null = this.loadNewestDate();
 
@@ -197,7 +202,7 @@ const TimeService = {
         }
     },
 
-    findNewNewestDate(newestDateBefore: Date) {
+    findNewNewestDate(newestDateBefore: Date): void {
 
         const oldestDate: Date | null = this.loadOldestDate();
 
@@ -340,7 +345,7 @@ const TimeService = {
         return this.calculateWorktimeForTimeRange(oldestDate, newestDate);
     },
 
-    saveWorkStart(workstartEntry: Entry) {
+    saveWorkStart(workstartEntry: Entry): void {
         localStorage.setItem(STORAGE_KEY_CURRENT_WORKSTART,STORAGE_KEY_ENTRY + dateToDateForSaving(workstartEntry.start));
     },
 
@@ -375,7 +380,7 @@ const TimeService = {
         return this.loadEntryFromJson(localStorage.getItem(currentWorkStartKey));
     },
 
-    stopWork() {
+    stopWork(): void {
         const currentWorkStartKey: string | null = localStorage.getItem(STORAGE_KEY_CURRENT_WORKSTART);
         localStorage.removeItem(STORAGE_KEY_CURRENT_WORKSTART);
 

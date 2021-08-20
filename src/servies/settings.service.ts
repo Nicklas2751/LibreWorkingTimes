@@ -29,7 +29,7 @@ export class SettingsServiceClass {
         return loadedPropertyJson && loadedPropertyJson != null ? JSON.parse(loadedPropertyJson) : defaultValue;
     }
 
-    public setDescription(description: string) {
+    public setDescription(description: string): void {
         this.saveConfigProperty(STORAGE_KEY_DESCRIPTION, description);
         this._description.value = description;
     }
@@ -38,7 +38,7 @@ export class SettingsServiceClass {
         return this._description;
     }
 
-    public setWorkDays(workdays: WorkDay[]) {
+    public setWorkDays(workdays: WorkDay[]): void {
         this.saveConfigProperty(STORAGE_KEY_WORKDAYS, workdays);
         this._workdays.value = workdays;
     }
@@ -47,7 +47,7 @@ export class SettingsServiceClass {
         return this._workdays;
     }
 
-    public setWorkTime(worktime: Duration) {
+    public setWorkTime(worktime: Duration): void {
         this.saveConfigProperty(STORAGE_KEY_WORKTIME, worktime);
         this._worktime.value = worktime;
     }
@@ -56,7 +56,7 @@ export class SettingsServiceClass {
         return this._worktime;
     }
 
-    public setBreakTime(breaktime: Duration) {
+    public setBreakTime(breaktime: Duration): void {
         this.saveConfigProperty(STORAGE_KEY_BREAKTIME, breaktime);
         this._breaktime.value = breaktime;
     }
