@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="512"
+   height="512"
+   viewBox="0 0 135.46666 135.46667"
+   version="1.1"
+   id="svg12"
+   inkscape:version="1.1 (ce6663b3b7, 2021-05-25)"
+   sodipodi:docname="icon.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview14"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     units="px"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:zoom="1.0633188"
+     inkscape:cx="-41.379876"
+     inkscape:cy="323.51539"
+     inkscape:window-width="1920"
+     inkscape:window-height="1163"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer3" />
+  <defs
+     id="defs9" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Background">
+    <rect
+       style="fill:#ff4242;fill-opacity:1;stroke:none;stroke-width:0.264568"
+       id="rect1275"
+       width="135.46666"
+       height="135.46666"
+       x="0"
+       y="0" />
+  </g>
+  <g
+     inkscape:label="Foreground"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g1398"
+       transform="matrix(0.67809563,0,0,0.67809563,43.136389,54.569729)">
+      <circle
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:3.96875;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="path219"
+         cx="36.273563"
+         cy="36.361641"
+         r="33.831211" />
+      <rect
+         style="fill:none;stroke:#000000;stroke-width:3.96875;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="rect1210"
+         width="2.3008749"
+         height="27.734426"
+         x="35.133537"
+         y="10.90517" />
+      <rect
+         style="fill:none;stroke:#000000;stroke-width:4.00915;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="rect1210-0"
+         width="1.685599"
+         height="19.079756"
+         x="4.2830057"
+         y="52.596027"
+         transform="matrix(0.65333979,-0.75706481,0.61170026,0.79108962,0,0)" />
+    </g>
+    <g
+       id="g1645"
+       transform="translate(5.8401502,-12.155876)">
+      <g
+         id="g1685"
+         transform="matrix(1.590663,0,0,1.590663,-4.2932221,-78.579491)">
+        <g
+           id="g10441">
+          <rect
+             style="fill:none;stroke:#000000;stroke-width:3.96875;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+             id="rect1422"
+             width="64.712929"
+             height="48.404156"
+             x="9.2528553"
+             y="82.64756" />
+          <rect
+             style="fill:none;stroke:#000000;stroke-width:3.96875;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+             id="rect1424"
+             width="30.481508"
+             height="14.450664"
+             x="26.368567"
+             y="68.196899" />
+        </g>
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-weight:normal;font-size:5.94874px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.148718"
+           x="13.14367"
+           y="127.82742"
+           id="text7123"><tspan
+             sodipodi:role="line"
+             id="tspan7121"
+             style="stroke-width:0.148718"
+             x="13.14367"
+             y="127.82742">LibreWorkingTimes</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>
