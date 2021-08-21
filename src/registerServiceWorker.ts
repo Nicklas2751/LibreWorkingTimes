@@ -3,9 +3,7 @@
 import { register } from 'register-service-worker'
 
 console.log("Registering service-worker");
-const url = location.href.substring(0, location.href.lastIndexOf("/")+1);
-
-register(url+'service-worker.js', {
+register('/service-worker.js', {
   ready () {
     console.log(
       'App is being served from cache by a service worker.\n' +
