@@ -158,55 +158,6 @@ function daysInMonth(month: number, year: number): number {
   return new Date(year, month, 0).getDate();
 }
 
-function setupMockData() {
-  const mockDataEntries: Entry[] = [
-    {
-      start: new Date(2021, 3, 26, 19, 0),
-      end: new Date(2021, 3, 26, 20, 0),
-      fullDay: false,
-      type: EntryType.WORK,
-    },
-    {
-      start: new Date(2021, 3, 23, 7, 45),
-      end: new Date(2021, 3, 23, 18),
-      fullDay: false,
-      type: EntryType.WORK,
-    },
-    {
-      start: new Date(2021, 3, 22, 6),
-      end: new Date(2021, 3, 22, 16),
-      fullDay: false,
-      type: EntryType.WORK,
-    },
-    {
-      start: new Date(2021, 3, 21, 20, 0),
-      end: new Date(2021, 3, 25, 20, 0),
-      fullDay: false,
-      type: EntryType.WORK,
-    },
-    {
-      start: new Date(2021, 3, 9, 0),
-      end: new Date(2021, 3, 9, 24),
-      fullDay: true,
-      type: EntryType.OVERTIME,
-    },
-    {
-      start: new Date(2021, 2, 26, 0),
-      end: new Date(2021, 2, 26, 24),
-      fullDay: true,
-      type: EntryType.ILL,
-    },
-    {
-      start: new Date(2021, 2, 14, 0),
-      end: new Date(2021, 2, 14, 24),
-      fullDay: true,
-      type: EntryType.VACATION,
-    },
-  ];
-  mockDataEntries.forEach((entry) =>
-    TimeService.saveEntryForDate(entry.start, TimeService.calculateEntry(entry))
-  );
-}
 function createItemSelectorTextForDate(date: Date): string {
   const day = date.toLocaleDateString(navigator.language, {
     day: "2-digit"
@@ -277,7 +228,6 @@ export default defineComponent({
     };
   },
   created() {
-    setupMockData();
     this.loadNextMonth();
     this.loadNextMonth();
     this.loadStatistics();
