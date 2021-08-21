@@ -6,7 +6,7 @@ LibreWorkingTimes is progressive web app (PWA) to easily mange working times.
 
 ## Usage
 
-Go to [libreworkingtimes.github.io](https://libreworkingtimes.github.io/)
+Go to [libreworkingtimes.wiegandt.eu](https://libreworkingtimes.wiegandt.eu/)
 
 ### iOS
 
