@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.b77e99b897f059ccb775476656c9ea44.js"
+  "/precache-manifest.5449c94b2db027bc28372df5eab67c37.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "libre-working-times"});
