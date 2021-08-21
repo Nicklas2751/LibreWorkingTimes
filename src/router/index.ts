@@ -4,10 +4,6 @@ import { RouteRecordRaw } from 'vue-router';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '',
-    redirect: '/times'
-  },
-  {
-    path: '/times',
     component: () => import ('../views/Times.vue')
   },
   {

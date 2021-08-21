@@ -16,7 +16,7 @@ function createItemSelectorTextForDate(date: Date): string {
 
 describe("Times overview", () => {
   before(() => {
-    cy.visit("/times");
+    cy.visit("/");
     cy.clearLocalStorage();
     cy.clearLocalStorageSnapshot();
   }),

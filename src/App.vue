@@ -63,7 +63,7 @@ export default defineComponent({
     const appPages = [
       {
         title: "pages.times",
-        url: '/times',
+        url: '/',
         iosIcon: calendarNumberOutline,
         mdIcon: calendarOutline,
       },
