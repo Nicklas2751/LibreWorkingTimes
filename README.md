@@ -4,6 +4,8 @@
 
 LibreWorkingTimes is progressive web app (PWA) to easily mange working times.
 
+[**User documentation**](https://docs.libreworkingtimes.wiegandt.eu/)
+
 ## Usage
 
 Go to [libreworkingtimes.wiegandt.eu](https://libreworkingtimes.wiegandt.eu/)
@@ -19,6 +21,8 @@ Go to [libreworkingtimes.wiegandt.eu](https://libreworkingtimes.wiegandt.eu/)
 
 1. Tap on `Add to Home Screen`
 2. Follow the instructions
+
+For more information see the [User documentation](https://docs.libreworkingtimes.wiegandt.eu/).
 
 ## Contributing Guide
 
