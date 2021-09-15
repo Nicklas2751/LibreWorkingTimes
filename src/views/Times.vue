@@ -380,18 +380,22 @@ export default defineComponent({
 
       (this.$refs.entryList as typeof IonList).$el.closeSlidingItems();
     },
+    findDayForDate(date: Date): Day | undefined
+    {
+      const foundMonth = this.months.find(month => month.monthNumber === date.getMonth());
+      if(foundMonth)
+      {
+        return foundMonth.days.find(day => day.date.toDateString() == date.toDateString());       
+      }
+    },
     updateTimeRange(start: Date, end: Date)
     {
       for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
-        const foundMonth = this.months.find(month => month.monthNumber === date.getMonth());
-        if(foundMonth)
+        const foundDay = this.findDayForDate(date);
+        const loadedEntry = TimeService.loadEntryForDate(date);
+        if(foundDay && loadedEntry != null)
         {
-          const foundDay = foundMonth.days.find(day => day.date.toDateString() == date.toDateString());       
-          const loadedEntry = TimeService.loadEntryForDate(date);
-          if(foundDay && loadedEntry != null)
-          {
-            foundDay.entry = loadedEntry;
-          }
+          foundDay.entry = loadedEntry;
         }
       }
     },
@@ -405,6 +409,15 @@ export default defineComponent({
             addEditModal.dismiss();
           },
           saveDayEntry: (entry: Entry) => {
+            if(!isSameDate(entry.start, day.date))
+            {
+              const foundDay = this.findDayForDate(entry.start);
+              if(foundDay)
+              {
+                day = foundDay;
+              }
+            }
+
             if (day.entry) {
               day.entry.overtime = entry.overtime;
             }

@@ -172,6 +172,31 @@ describe("Times overview", () => {
     //THEN
     cy.get("#times-item-"+dayString+" #times-item-stats").should("have.text","0:002:00");
     cy.get("#complete-overtime").should("have.text","Overtime: -6:00");
+  }),
+
+  it("Add work entry, change start date, saved to right day", () => {
+    //GIVEN
+    const today = new Date();
+    const date = new Date(today);
+    const todayDayString: string = createItemSelectorTextForDate(today);
+
+    date.setDate(today.getDate()-6);
+    const dateDayString: string = createItemSelectorTextForDate(date);
+    cy.get("#times-item-"+todayDayString).click({force: true});
+
+    //WHEN
+    //Open start change dialog
+    cy.get('#times-new-entry-work-start').click();
+    //Select today - 6 days
+    cy.get(':nth-child(2) > .picker-opts > [opt-index="8"]').click({force: true});
+    //Accept overlay
+    cy.get(':nth-child(2) > .picker-button').click();
+    //Save entry
+    cy.get("#times-new-entry-"+todayDayString+" #times-new-entry-save").click();
+
+    //THEN
+    cy.get("#times-item-"+dateDayString+" #times-item-stats").should("have.text","8:000:00");
+    cy.get("#times-item-"+todayDayString+" #times-item-stats").should('not.exist');
   })
   //cy.get("#today-stats").should("have.text","8:000:00")
 })
