@@ -360,7 +360,7 @@ export default defineComponent({
       const latestDay =
         year === new Date().getFullYear() && month === new Date().getMonth()
           ? new Date().getDate()
-          : daysInMonth(month, year) - 1;
+          : daysInMonth(month, year);
 
       for (let day = latestDay; day > 0; day--) {
         const date = new Date(year, month, day);
