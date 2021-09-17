@@ -156,6 +156,7 @@ function isSameDate(first: Date, second: Date) {
 
 export default defineComponent({
   name: "TimeAddAndEditModal",
+  entryEndChangedOrLoaded: false,
   overtimeMode: OvertimeMode.ADD,
   components: {
     IonContent,
@@ -183,6 +184,7 @@ export default defineComponent({
     return {
       entry: (undefined as unknown) as Entry,
       overtimeMode: OvertimeMode.ADD,
+      entryEndChangedOrLoaded: false,
       EntryType,
       OvertimeMode,
     };
@@ -226,6 +228,7 @@ export default defineComponent({
         const entry: Entry = JSON.parse(JSON.stringify(this.day.entry));
         entry.start = new Date(entry.start);
         if (entry.end) {
+          this.entryEndChangedOrLoaded = true;
           entry.end = new Date(entry.end);
         } else {
           entry.end = this.getEndDateTime(this.day, entry.pausetime);
@@ -305,12 +308,17 @@ export default defineComponent({
     },
     changeEntryStart(event: CustomEvent) {
       this.entry.start = new Date(event.detail.value);
-      this.entry.end = TimeService.calculatePerfectEnd(
-        this.entry.start,
-        this.entry.pausetime
-      );
+      if(!this.entryEndChangedOrLoaded)
+      {
+        this.entry.end = TimeService.calculatePerfectEnd(
+          this.entry.start,
+          this.entry.pausetime
+        );
+        this.entryEndChangedOrLoaded = false;
+      }
     },
     changeEntryEnd(event: CustomEvent) {
+      this.entryEndChangedOrLoaded = true;
       this.entry.end = new Date(event.detail.value);
     },
     getOvertimeForPicker() {
