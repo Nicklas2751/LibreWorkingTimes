@@ -188,7 +188,14 @@ describe("Times overview", () => {
     //Open start change dialog
     cy.get('#times-new-entry-work-start').click();
     //Select today - 6 days
-    cy.get(':nth-child(2) > .picker-opts > [opt-index="8"]').click({force: true});
+    cy.get(':nth-child(2) > .picker-opts > [opt-index="'+(date.getDate()-1)+'"]').click({force: true});
+    //Changes the month if the day is in a other month
+    if(date.getMonth() < today.getMonth())
+    {
+      cy.get(':nth-child(3) > .picker-opts > [opt-index="'+(date.getMonth())+'"]').click({force: true});
+    }
+    
+    
     //Accept overlay
     cy.get(':nth-child(2) > .picker-button').click();
     //Save entry
