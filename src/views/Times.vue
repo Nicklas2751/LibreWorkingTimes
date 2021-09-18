@@ -41,7 +41,7 @@
           >
           <ion-item-sliding v-for="day in month.days" v-bind:key="day.day">
             <ion-item
-              :id="'times-item-'+(day.day < 10 ? '0' : '')+day.day+'-'+month.name.toLowerCase()+'-'+month.year"
+              :id="formatDateForId(day.date)"
               @click="openAddEditModal(day)"
             >
               <ion-grid>
@@ -187,6 +187,8 @@ function isSameDate(first: Date, second: Date) {
   );
 }
 
+
+
 export default defineComponent({
   interval: 1000,
   months: [],
@@ -230,10 +232,40 @@ export default defineComponent({
   created() {
     this.loadNextMonth();
     this.loadNextMonth();
+
+    const newestDate: Date | null = TimeService.loadNewestDate();
+    if(newestDate != null && newestDate > new Date())
+    {
+      this.loadMonthsInFutureUntil(newestDate);
+    }
     this.loadStatistics();
     this.interval = setInterval(this.loadStatistics, 1000);
   },
+  mounted() {
+    this.scrollToDate(new Date());
+  },
   methods: {
+    formatDateForId(date: Date) {
+      const day = date.toLocaleDateString(navigator.language, {
+        day: "2-digit"
+      }).toLowerCase();
+      const month = date.toLocaleDateString(navigator.language, {
+        month: "long"
+      }).toLowerCase();
+      const year = date.toLocaleDateString(navigator.language, {
+        year: "numeric"
+      }).toLowerCase();
+
+      return "times-item-"+day+"-"+month+"-"+year;
+    },
+    scrollToDate(date: Date) {
+      const element = this.$el.querySelector('#'+this.formatDateForId(date));
+      if(element)
+      {
+        //element.scrollIntoView({alignToTop:true, behavior: 'smooth'});
+        window.scrollTo(0, element.offsetTop+20);
+      }
+    },
     loadCompleteOvertime() {
       this.completeOvertime = this.formatDuration(
         TimeService.calculateOvertimeComplete()
@@ -337,17 +369,15 @@ export default defineComponent({
       }
       return newDay;
     },
-    async loadNextMonth() {
+    async loadMonth(month: number, year: number, date?: number) {
       const baseDate = new Date();
       baseDate.setDate(1);
-      baseDate.setMonth((new Date().getMonth() - this.monthModifier));
-      const month = baseDate.getMonth();
-      const year = baseDate.getFullYear();
+      baseDate.setMonth(month);
 
       const onlyMonthNameOptions: Intl.DateTimeFormatOptions = {
         month: "long",
       };
-      const currentMonth: Month = {
+      const newMonth: Month = {
         name: new Date(year, month).toLocaleDateString(
           navigator.language,
           onlyMonthNameOptions
@@ -357,19 +387,37 @@ export default defineComponent({
         days: [],
       };
 
+      let maxDayOfMonth: Date;
+      if(date)
+      {
+        maxDayOfMonth = new Date(year, month, date);
+      } else {
+        maxDayOfMonth = new Date();
+      }
+
       const latestDay =
-        year === new Date().getFullYear() && month === new Date().getMonth()
-          ? new Date().getDate()
+        year === maxDayOfMonth.getFullYear() && month === maxDayOfMonth.getMonth()
+          ? maxDayOfMonth.getDate()
           : daysInMonth(month, year);
 
       for (let day = latestDay; day > 0; day--) {
         const date = new Date(year, month, day);
         const newDay: Day = this.getDayForDate(date);
 
-        currentMonth.days.push(newDay);
+        newMonth.days.push(newDay);
       }
-      this.months.push(currentMonth);
-
+      if(year == new Date().getFullYear() && month == new Date().getMonth())
+      {
+        this.months[0] = newMonth;
+      } else if(year > new Date().getFullYear() || month > new Date().getMonth())
+      {
+        this.months.unshift(newMonth);
+      } else {
+        this.months.push(newMonth);
+      }
+    },
+    async loadNextMonth() {
+      this.loadMonth((new Date().getMonth() - this.monthModifier), new Date().getFullYear());
       this.monthModifier++;
     },
     async deleteEntryForDay(day: Day) {
@@ -409,19 +457,25 @@ export default defineComponent({
             addEditModal.dismiss();
           },
           saveDayEntry: (entry: Entry) => {
+            let dayToSaveEntryTo: Day = day;
             if(!isSameDate(entry.start, day.date))
             {
               const foundDay = this.findDayForDate(entry.start);
               if(foundDay)
               {
-                day = foundDay;
+                dayToSaveEntryTo = foundDay;
               }
             }
 
-            if (day.entry) {
-              day.entry.overtime = entry.overtime;
+            if(entry.start > new Date())
+            {
+              this.loadMonthsInFutureUntil(entry.start);
             }
-            day.entry = entry;
+
+            /*if (dayToSaveEntryTo.entry) {
+              dayToSaveEntryTo.entry.overtime = entry.overtime;
+            }*/
+            dayToSaveEntryTo.entry = entry;
 
             if(entry.end && entry.start.toDateString() !== entry.end.toDateString())
             {
@@ -434,6 +488,34 @@ export default defineComponent({
         },
       });
       return addEditModal.present();
+    },
+    loadMonthsInFutureUntil(date: Date){
+      if(date.getMonth() == new Date().getMonth() && date.getFullYear() == new Date().getFullYear())
+      {
+        //Current month but newer date
+        const monthToLoad = new Date(date);
+        this.loadMonth(monthToLoad.getMonth(), monthToLoad.getFullYear(), monthToLoad.getDate());
+      } else {
+        //Month in future
+        const nextMonth = new Date();
+        nextMonth.setHours(0, 0, 0, 0);
+        nextMonth.setDate(1);
+        if(this.months[0])
+        {
+          nextMonth.setFullYear(this.months[0].year);
+        }
+        nextMonth.setMonth(this.months[0] ? this.months[0].monthNumber+1 : nextMonth.getMonth()+1);
+
+        for(const monthToLoad: Date = nextMonth; monthToLoad < date; monthToLoad.setMonth(monthToLoad.getMonth()+1))
+        {
+          if(monthToLoad.getFullYear() == date.getFullYear() && monthToLoad.getMonth() == date.getMonth())
+          {
+            this.loadMonth(monthToLoad.getMonth(), monthToLoad.getFullYear(), date.getDate());  
+          } else {
+            this.loadMonth(monthToLoad.getMonth(), monthToLoad.getFullYear());
+          }
+        }
+      }
     },
     getWorktimeForDate(date: Date) {
       const dateEntry: Entry | undefined = this.getDayEntry(

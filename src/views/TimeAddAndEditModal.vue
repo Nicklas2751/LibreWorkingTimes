@@ -259,13 +259,15 @@ export default defineComponent({
     save() {
       const calculatedEntry = TimeService.calculateEntry(this.entry);
 
-      if (
-        (this.overtimeMode == OvertimeMode.REMOVE &&
-          calculatedEntry.overtime &&
-          calculatedEntry.overtime.hours > 0) ||
-        (this.overtimeMode == OvertimeMode.ADD &&
-          calculatedEntry.overtime &&
-          calculatedEntry.overtime.hours < 0)
+      if (this.entry.type == EntryType.OVERTIME &&
+        (
+          (this.overtimeMode == OvertimeMode.REMOVE &&
+            calculatedEntry.overtime &&
+            calculatedEntry.overtime.hours > 0) ||
+          (this.overtimeMode == OvertimeMode.ADD &&
+            calculatedEntry.overtime &&
+            calculatedEntry.overtime.hours < 0)
+        )
       ) {
         //Change sign if it don't matches to the mode
         calculatedEntry.overtime.hours = calculatedEntry.overtime.hours * -1;
@@ -276,27 +278,27 @@ export default defineComponent({
         this.entry.type == EntryType.OVERTIME ||
         this.entry.type == EntryType.VACATION
       ) {
-        this.entry.worktime = new Duration(0, 0);
+        calculatedEntry.worktime = new Duration(0, 0);
       }
 
       //Set overtime for vacation to 0
       if (this.entry.type == EntryType.VACATION) {
-        this.entry.overtime = new Duration(0, 0);
+        calculatedEntry.overtime = new Duration(0, 0);
       }
 
       //If not type work set start and end time to 0:00
       if(this.entry.type != EntryType.WORK)
       {
-        this.entry.start.setHours(0,0,0,0);
+        calculatedEntry.start.setHours(0,0,0,0);
 
-        if(this.entry.end)
+        if(calculatedEntry.end)
         {
-          this.entry.end.setHours(0,0,0,0);
+          calculatedEntry.end.setHours(0,0,0,0);
         }
       }
 
       //Save to local storage
-      TimeService.saveEntryForDate(this.entry.start, calculatedEntry);
+      TimeService.saveEntryForDate(calculatedEntry.start, calculatedEntry);
 
       //Update entry in list
       if (this.saveDayEntry) {

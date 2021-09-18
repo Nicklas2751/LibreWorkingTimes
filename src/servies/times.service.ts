@@ -29,9 +29,9 @@ function durationToMomentJSDuration(duration: Duration) {
 }
 
 
-function calculateOvertime(momentDuration: moment.Duration, duration: Duration): moment.Duration {
-    const durationAsMomentDuration = durationToMomentJSDuration(duration);
-    return momentDuration.subtract(durationAsMomentDuration);
+function calculateOvertime(workTimeDuration: moment.Duration, paueTimeDuration: Duration): moment.Duration {
+    const paueTimeDurationAsMomentDuration = durationToMomentJSDuration(paueTimeDuration);
+    return workTimeDuration.subtract(paueTimeDurationAsMomentDuration);
 }
 
 function parseDate(dateText: string | null): Date | null {
@@ -251,16 +251,13 @@ const TimeService = {
 
             let worktimeDuration: moment.Duration;
 
-            //if (updatedEntry.start < updatedEntry.end) {
             worktimeDuration = moment.duration(moment(updatedEntry.end).diff(moment(updatedEntry.start)));
-            /*} else {
-                worktimeDuration = moment.duration(moment(updatedEntry.start).diff(moment(updatedEntry.end)));
-            }*/
-
+            //Substract pause time from worktime
             worktimeDuration = calculateOvertime(worktimeDuration, entry.pausetime);
 
 
             updatedEntry.worktime = calcDurationFromMinutes(worktimeDuration.asMinutes());
+            //Calculate overtime
             updatedEntry.overtime = calcDurationFromMinutes(calculateOvertime(worktimeDuration, dailyWorktime).asMinutes());
         } else if (updatedEntry.type === EntryType.OVERTIME) {
             if (!entry.overtime) {

@@ -237,6 +237,28 @@ describe('times.service.ts', () => {
         //THEN
         expect(calculated.overtime).toMatchObject<Duration>(new Duration(1, 30));
     }),
+    it('calculate work entry positive overtime in future', () => {
+
+        //GIVEN
+        const tomorrow: Date = new Date();
+        tomorrow.setDate(tomorrow.getDate()+1);
+        const tomorrowTenHoursLater: Date = new Date(tomorrow);
+        tomorrowTenHoursLater.setMinutes(tomorrow.getMinutes() + 600);
+
+        const testEntry: Entry = {
+            fullDay: false,
+            start: tomorrow,
+            end: tomorrowTenHoursLater,
+            type: EntryType.WORK,
+        };
+
+
+        //WHEN
+        const calculated = TimeService.calculateEntry(testEntry);
+
+        //THEN
+        expect(calculated.overtime).toMatchObject<Duration>(new Duration(1, 30));
+    }),
     it('calculate work entry negative overtime', () => {
 
         //GIVEN
