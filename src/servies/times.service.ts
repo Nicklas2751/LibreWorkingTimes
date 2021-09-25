@@ -43,12 +43,12 @@ function parseDate(dateText: string | null): Date | null {
 
 function isSameDate(first: Date, second: Date) {
     return (
-        first.toLocaleTimeString(navigator.language, {
+        first.toLocaleDateString(navigator.language, {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
         }) ===
-        second.toLocaleTimeString(navigator.language, {
+        second.toLocaleDateString(navigator.language, {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",

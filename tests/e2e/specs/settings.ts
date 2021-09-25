@@ -28,7 +28,7 @@ describe("Settings", () => {
   }),
 
   it("Check work times default value", () => {
-    cy.get("#settings-worktimes").invoke('val').then(val => console.log("Val: "+val)).should('deep.equal', [new WorkDayImpl("monday", 1),  new WorkDayImpl("tuesday", 2),  new WorkDayImpl("wednesday", 3),  new WorkDayImpl("thursday", 4),  new WorkDayImpl("friday", 5)]);
+    cy.get("#settings-worktimes").invoke('val').should('deep.equal', [new WorkDayImpl("monday", 1),  new WorkDayImpl("tuesday", 2),  new WorkDayImpl("wednesday", 3),  new WorkDayImpl("thursday", 4),  new WorkDayImpl("friday", 5)]);
   }),
 
   it("Change description", () => {

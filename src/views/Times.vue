@@ -155,7 +155,7 @@ import TimeAddAndEditModalVue from "./TimeAddAndEditModal.vue";
 import { add, addOutline, close } from "ionicons/icons";
 
 function daysInMonth(month: number, year: number): number {
-  return new Date(year, month, 0).getDate();
+  return new Date(year, month+1, 0).getDate();
 }
 
 function createItemSelectorTextForDate(date: Date): string {
@@ -230,14 +230,14 @@ export default defineComponent({
     };
   },
   created() {
-    this.loadNextMonth();
-    this.loadNextMonth();
-
     const newestDate: Date | null = TimeService.loadNewestDate();
     if(newestDate != null && newestDate > new Date())
     {
       this.loadMonthsInFutureUntil(newestDate);
+      this.monthModifier = 1;
     }
+    this.loadNextMonth();
+    this.loadNextMonth();
     this.loadStatistics();
     this.interval = setInterval(this.loadStatistics, 1000);
   },
@@ -270,6 +270,9 @@ export default defineComponent({
       this.completeOvertime = this.formatDuration(
         TimeService.calculateOvertimeComplete()
       );
+    },
+    isToday(day: Day): boolean {
+      return isSameDate(day.date, new Date());
     },
     getDayEntry(day: Day): Entry | undefined {
       if (day.entry) {
@@ -387,18 +390,15 @@ export default defineComponent({
         days: [],
       };
 
-      let maxDayOfMonth: Date;
+      let latestDay: number;
       if(date)
       {
-        maxDayOfMonth = new Date(year, month, date);
+        latestDay = date;
+      } else if(this.months.length === 0) {
+        latestDay = new Date().getDate();
       } else {
-        maxDayOfMonth = new Date();
+        latestDay = daysInMonth(month, year)
       }
-
-      const latestDay =
-        year === maxDayOfMonth.getFullYear() && month === maxDayOfMonth.getMonth()
-          ? maxDayOfMonth.getDate()
-          : daysInMonth(month, year);
 
       for (let day = latestDay; day > 0; day--) {
         const date = new Date(year, month, day);
@@ -406,10 +406,13 @@ export default defineComponent({
 
         newMonth.days.push(newDay);
       }
-      if(year == new Date().getFullYear() && month == new Date().getMonth())
+      
+      const foundMonthIndex = this.months.findIndex(searchMonth => searchMonth.year == year && searchMonth.monthNumber == month);
+
+      if(foundMonthIndex >= 0)
       {
-        this.months[0] = newMonth;
-      } else if(year > new Date().getFullYear() || month > new Date().getMonth())
+        this.months[foundMonthIndex] = newMonth;
+      } else if(this.months[0] && (year > this.months[0].year || month > this.months[0].monthNumber))
       {
         this.months.unshift(newMonth);
       } else {
@@ -490,30 +493,17 @@ export default defineComponent({
       return addEditModal.present();
     },
     loadMonthsInFutureUntil(date: Date){
-      if(date.getMonth() == new Date().getMonth() && date.getFullYear() == new Date().getFullYear())
-      {
-        //Current month but newer date
-        const monthToLoad = new Date(date);
-        this.loadMonth(monthToLoad.getMonth(), monthToLoad.getFullYear(), monthToLoad.getDate());
-      } else {
-        //Month in future
-        const nextMonth = new Date();
-        nextMonth.setHours(0, 0, 0, 0);
-        nextMonth.setDate(1);
-        if(this.months[0])
-        {
-          nextMonth.setFullYear(this.months[0].year);
-        }
-        nextMonth.setMonth(this.months[0] ? this.months[0].monthNumber+1 : nextMonth.getMonth()+1);
+      const newestMonth = new Date();
+      newestMonth.setHours(0, 0, 0, 0);
+      newestMonth.setDate(1);
 
-        for(const monthToLoad: Date = nextMonth; monthToLoad < date; monthToLoad.setMonth(monthToLoad.getMonth()+1))
+      for(const monthToLoad: Date = newestMonth; monthToLoad < date; monthToLoad.setMonth(monthToLoad.getMonth()+1))
+      {
+        if(monthToLoad.getFullYear() == date.getFullYear() && monthToLoad.getMonth() == date.getMonth())
         {
-          if(monthToLoad.getFullYear() == date.getFullYear() && monthToLoad.getMonth() == date.getMonth())
-          {
-            this.loadMonth(monthToLoad.getMonth(), monthToLoad.getFullYear(), date.getDate());  
-          } else {
-            this.loadMonth(monthToLoad.getMonth(), monthToLoad.getFullYear());
-          }
+          this.loadMonth(monthToLoad.getMonth(), monthToLoad.getFullYear(), date.getDate());  
+        } else {
+          this.loadMonth(monthToLoad.getMonth(), monthToLoad.getFullYear());
         }
       }
     },
