@@ -41,7 +41,9 @@ const messages = {
       pages: {
         times: "Times",
         evaluation: "Evaluation",
-        settings: "Settings"
+        settings: "Settings",
+        about: "About",
+        help: "Help"
       },
       times: {
           overtimeLabel: "Overtime",
@@ -106,6 +108,30 @@ const messages = {
         average: "Average",
         averageWorktimeHoursPerMonth: "Working hours: {averageWorktime} hours per month",
         averageOvertimeHoursPerMonth: "Overtime: {averageOvertime} hours in month"
+      },
+      about: {
+        textFirstHalf: "LibreWorkingTimes is a ",
+        textSecondHalf: " progressive web app (PWA) to easily mange working times, overtime, sick days and holidays for free.",
+        license: "License",
+        legal: "Legal",
+        privacy: "Privacy"
+      },
+      help: {
+        userDocs: "User documentation",
+        faq: {
+          1: {
+            question: "Q: Where is my data safed?",
+            answer: "A: All data is safed on your device."
+          },
+          2: {
+            question: "Q: Where is my data?",
+            answer: "A: Your data is safed in the used webbrowser on your device. If you can't see your data, make sure you use the right device and the right webbrowser."
+          },
+          3: {
+            question: "Q: How can I synchronise/export my data?",
+            answer: "A: This feature is planned but not implemented yet."
+          }
+        }
       }
   },
   de: {
@@ -116,7 +142,9 @@ const messages = {
       pages: {
         times: "Zeiten",
         evaluation: "Auswertung",
-        settings: "Einstellungen"
+        settings: "Einstellungen",
+        about: "Über",
+        help: "Hilfe"
       },
       times: {
           overtimeLabel: "Überstunden",
@@ -181,6 +209,30 @@ const messages = {
         average: "Durchschnitt",
         averageWorktimeHoursPerMonth: "Arbeitszeit: {averageWorktime} Stunden im Monat",
         averageOvertimeHoursPerMonth: "Überstunden: {averageOvertime} Stunden im Monat"
+      },
+      about: {
+        textFirstHalf: "LibreWorkingTimes ist eine ",
+        textSecondHalf: " progressive web app (PWA) zum einfachen, kostenlosen Verwalten von Arbeitszeiten, Überstunden, Krankheitstagen und Urlaubstagen.",
+        license: "Lizenz",
+        legal: "Impressum",
+        privacy: "Datenschutzerklärung"
+      },
+      help: {
+        userDocs: "Benutzerdokumentation",
+        faq: {
+          1: {
+            question: "F: Wo werden meine Daten gespeichert?",
+            answer: "A: Alle Daten werden direkt auf deinem Gerät gespeichert."
+          },
+          2: {
+            question: "F: Wo sind meine Daten?",
+            answer: "A: Deine Daten werden direkt in den von dir verwendeten Webbrowser auf deinem Gerät gespeichert. Wenn du deine Daten nicht sehen kannst gehe sicher, dass du das richtige Gerät und den richtigen Webbrowser verwendest."
+          },
+          3: {
+            question: "F: Wie kann ich meine Daten synchronisieren/exportieren?",
+            answer: "A: Dieses Feature ist geplant aber wurde bisher noch nicht umgesetzt."
+          }
+        }
       }
   }
 }

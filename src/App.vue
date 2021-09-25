@@ -8,7 +8,7 @@
             <ion-note>{{ description }}</ion-note>
   
             <ion-menu-toggle auto-hide="false" v-for="(p, i) in appPages" :key="i">
-              <ion-item router-direction="root" :router-link="p.url" lines="none" detail="false" class="hydrated" :class="{ selected: selectedIndex() === i }">
+              <ion-item router-direction="root" :router-link="p.url" lines="none" detail="false" style="cursor: pointer;" class="hydrated" :class="{ selected: selectedIndex() === i }">
                 <ion-icon slot="start" :ios="p.iosIcon" :md="p.mdIcon"></ion-icon>
                 <ion-label>{{ $t(p.title) }}</ion-label>
               </ion-item>
@@ -24,7 +24,7 @@
 import { IonApp, IonContent, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonMenu, IonMenuToggle, IonNote, IonRouterOutlet, IonSplitPane } from '@ionic/vue';
 import { defineComponent } from 'vue';
 import { useRoute } from 'vue-router';
-import { calendarNumberOutline, calendarOutline, calendarSharp, pieChart, pieChartOutline, pieChartSharp, settings, settingsOutline, settingsSharp } from 'ionicons/icons';
+import { calendarNumberOutline, calendarOutline, calendarSharp, pieChart, pieChartOutline, pieChartSharp, settings, settingsOutline, settingsSharp, help, helpOutline, information, informationOutline } from 'ionicons/icons';
 import SettingsService from "@/servies/settings.service";
 
 
@@ -78,6 +78,18 @@ export default defineComponent({
         url: '/settings',
         iosIcon: settingsOutline,
         mdIcon: settings
+      },
+      {
+        title: 'pages.help',
+        url: '/help',
+        iosIcon: helpOutline,
+        mdIcon: help
+      },
+      {
+        title: 'pages.about',
+        url: '/about',
+        iosIcon: informationOutline,
+        mdIcon: information
       }
     ];
     
