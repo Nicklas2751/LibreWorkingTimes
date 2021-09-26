@@ -241,9 +241,6 @@ export default defineComponent({
     this.loadStatistics();
     this.interval = setInterval(this.loadStatistics, 1000);
   },
-  mounted() {
-    this.scrollToDate(new Date());
-  },
   methods: {
     formatDateForId(date: Date) {
       const day = date.toLocaleDateString(navigator.language, {
@@ -257,14 +254,6 @@ export default defineComponent({
       }).toLowerCase();
 
       return "times-item-"+day+"-"+month+"-"+year;
-    },
-    scrollToDate(date: Date) {
-      const element = this.$el.querySelector('#'+this.formatDateForId(date));
-      if(element)
-      {
-        //element.scrollIntoView({alignToTop:true, behavior: 'smooth'});
-        window.scrollTo(0, element.offsetTop+20);
-      }
     },
     loadCompleteOvertime() {
       this.completeOvertime = this.formatDuration(
@@ -281,7 +270,6 @@ export default defineComponent({
         }
         return day.entry;
       }
-      return;
     },
     loadStatistics() {
       this.loadTodayEntry();
@@ -312,15 +300,29 @@ export default defineComponent({
       }
     },
     switchLabelColor(day: Day) {
-      return day.entry
-        ? day.entry.type === EntryType.OVERTIME
-          ? "warning"
-          : day.entry.type === EntryType.VACATION
-          ? "secondary"
-          : day.entry.type === EntryType.ILL
-          ? "tertiary"
-          : "primary"
-        : "medium";
+      if(day.entry)
+      {
+
+        if(day.entry.type === EntryType.OVERTIME)
+        {
+          return "warning";
+        }
+
+        if(day.entry.type === EntryType.VACATION)
+        {
+          return "secondary";
+        }
+
+        if(day.entry.type === EntryType.ILL)
+        {
+          return "tertiary";
+        }
+
+        return "primary";
+
+      }
+
+      return "medium";
     },
     switchOvertimeColor(overtime: Duration | undefined) {
       if (!overtime) {
@@ -401,8 +403,8 @@ export default defineComponent({
       }
 
       for (let day = latestDay; day > 0; day--) {
-        const date = new Date(year, month, day);
-        const newDay: Day = this.getDayForDate(date);
+        const dayDate = new Date(year, month, day);
+        const newDay: Day = this.getDayForDate(dayDate);
 
         newMonth.days.push(newDay);
       }
@@ -475,9 +477,6 @@ export default defineComponent({
               this.loadMonthsInFutureUntil(entry.start);
             }
 
-            /*if (dayToSaveEntryTo.entry) {
-              dayToSaveEntryTo.entry.overtime = entry.overtime;
-            }*/
             dayToSaveEntryTo.entry = entry;
 
             if(entry.end && entry.start.toDateString() !== entry.end.toDateString())

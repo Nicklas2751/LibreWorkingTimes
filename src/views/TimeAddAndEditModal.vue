@@ -366,13 +366,20 @@ export default defineComponent({
   },
   computed: {
     title(): string {
-      return this.day
-        ? (this.day.entry && isSameDate(this.day.entry.start, this.entry.start)
-            ? this.$t("times.modal.edit")
-            : this.$t("times.modal.add")) +
-            " " +
-            this.entry.start.toLocaleDateString(navigator.language)
-        : "";
+      if(this.day)
+      {
+        let mode: string;
+        if(this.day.entry && isSameDate(this.day.entry.start, this.entry.start))
+        {
+            mode = this.$t("times.modal.edit");
+        } else {
+            mode = this.$t("times.modal.add");
+        } 
+
+        return mode + " " + this.entry.start.toLocaleDateString(navigator.language);
+      } 
+      
+      return "";
     },
   },
 });

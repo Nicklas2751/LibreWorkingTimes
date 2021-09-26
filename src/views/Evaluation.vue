@@ -136,7 +136,7 @@
 
               <ion-card-content>
                 <LineChart :chartData="chartData" :options="chartOptions" /><br/>
-                <b>{{ $t("evaluation.average") }}:</b><br/>
+                <strong>{{ $t("evaluation.average") }}:</strong><br/>
                 {{ $t("evaluation.averageWorktimeHoursPerMonth",{averageWorktime: calcAverageWorktime()}) }} <br/>
                 {{ $t("evaluation.averageOvertimeHoursPerMonth",{averageOvertime: calcAverageOvertime()}) }}
               </ion-card-content>
