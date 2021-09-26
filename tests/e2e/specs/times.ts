@@ -204,6 +204,31 @@ describe("Times overview", () => {
     //THEN
     cy.get("#times-item-"+dateDayString+" #times-item-stats").should("have.text","8:000:00");
     cy.get("#times-item-"+todayDayString+" #times-item-stats").should('not.exist');
+  }),
+
+  it("Is workday color other then non working day", () => {
+    const today = new Date();
+    const workingday = new Date(today);
+    const nonWorkingday = new Date(today);
+
+    workingday.setDate(today.getDate()-7);
+    nonWorkingday.setDate(today.getDate()-8);
+
+    while(workingday.getDay() == 0 || workingday.getDay() == 6)
+    {
+      workingday.setDate(workingday.getDate()-1);
+    }
+
+    while(nonWorkingday.getDay() > 0 && nonWorkingday.getDay() < 6)
+    {
+      nonWorkingday.setDate(nonWorkingday.getDate()-1);
+    }
+
+    const workingDayDayString: string = createItemSelectorTextForDate(workingday);
+    const nonWorkingDaydayDayString: string = createItemSelectorTextForDate(nonWorkingday);
+
+    //THEN
+    cy.get("#times-item-"+workingDayDayString+" ion-label").invoke("attr", "color").should("eq","dark");
+    cy.get("#times-item-"+nonWorkingDaydayDayString+" ion-label").invoke("attr", "color").should("eq","medium");
   })
-  //cy.get("#today-stats").should("have.text","8:000:00")
 })
