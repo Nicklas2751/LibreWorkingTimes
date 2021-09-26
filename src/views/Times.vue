@@ -153,6 +153,7 @@ import TimeService from "@/servies/times.service";
 import { defineComponent } from "vue";
 import TimeAddAndEditModalVue from "./TimeAddAndEditModal.vue";
 import { add, addOutline, close } from "ionicons/icons";
+import SettingsService from "@/servies/settings.service";
 
 function daysInMonth(month: number, year: number): number {
   return new Date(year, month+1, 0).getDate();
@@ -320,6 +321,11 @@ export default defineComponent({
 
         return "primary";
 
+      }
+
+      if(SettingsService.workdays.value.find(workday => workday.day === day.date.getDay()))
+      {
+        return "dark";
       }
 
       return "medium";
